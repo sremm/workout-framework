@@ -1,5 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Union, List
+
+from datetime import datetime
+from uuid import uuid4
+from uuid import UUID
 
 
 @dataclass
@@ -11,7 +15,8 @@ class Set:
 
 @dataclass
 class Session:
-    """ Class for keeping track of session data"""
+    """ Class for keeping track of session data """
 
-    id: int
-    sets: List[Set]
+    sets: List[Set] = field(default_factory=list)
+    id: UUID = field(default_factory=uuid4)
+    date_time: datetime = field(default_factory=datetime.now)
