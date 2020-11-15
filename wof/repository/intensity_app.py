@@ -33,6 +33,12 @@ def _group_by_date(data: pd.DataFrame) -> Dict[str, pd.DataFrame]:
 
 def _convert_rows_to_sets(data: pd.DataFrame) -> List[Set]:
     def _convert_row_to_set(row: pd.Series) -> Set:
-        return Set(excercise=row["Exercise"])
+        return Set(
+            excercise=row["Exercise"],
+            reps=row["Reps"],
+            weights=row["Weight"],
+            unit=row["Unit"],
+            set_number=row["Set"],
+        )
 
     return list(data.apply(lambda row: _convert_row_to_set(row), axis=1))
