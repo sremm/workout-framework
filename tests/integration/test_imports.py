@@ -1,5 +1,5 @@
 from wof.domain.types import Set
-from wof.repository import intensity_app
+from wof.import_logic import intensity_app
 
 from pathlib import Path
 import pytest
