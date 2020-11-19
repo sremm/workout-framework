@@ -8,10 +8,14 @@ from wof.repository.csv import CSVRepository
 
 
 @click.command()
-@click.option("--path", type=str, help="Path to file to import from")
-def add_to_repository(path: str):
-    sessions = intensity_app.import_from_file(Path(path))
-    repository: BaseRepository = CSVRepository()
+@click.option("--path-to-import", type=str, help="Path to file to import from")
+@click.option(
+    "--path-to-dataset", type=str, help="Path to file holding the csv dataset"
+)
+def add_to_repository(path_to_import: str, path_to_dataset: str):
+    """ Simple CLI to import data from intensity export file """
+    sessions = intensity_app.import_from_file(Path(path_to_import))
+    repository: BaseRepository = CSVRepository(Path(path_to_dataset))
     repository.add(sessions)
 
 
