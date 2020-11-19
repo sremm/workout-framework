@@ -1,3 +1,4 @@
+""" Simple CLI to import data from intensity export file """
 from pathlib import Path
 
 import click
