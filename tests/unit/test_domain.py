@@ -12,6 +12,6 @@ def test_add_sets_to_session():
 
 def test_create_set_with_multiple_exercises():
     a_set = Set(
-        exercise=[Exercise(0, "first"), Exercise(1, "second")],
+        exercise=["first", "second"],
     )
     assert len(a_set) == 2
