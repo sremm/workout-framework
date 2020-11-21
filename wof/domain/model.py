@@ -45,7 +45,7 @@ class Session:
     date_time: datetime = field(default_factory=datetime.now)
 
     def add_sets(self, sets: List[Set]) -> None:
-        pass
+        self.sets.extend(sets)
 
     def __len__(self) -> int:
         return len(self.sets)
