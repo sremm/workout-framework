@@ -21,6 +21,7 @@ def add_to_repository(path_to_import: str, path_to_dataset: str):
     sessions = intensity_app.import_from_file(Path(path_to_import))
     repository: BaseRepository = CSVRepository(Path(path_to_dataset))
     repository.add(sessions)
+    repository.save()
 
 
 if __name__ == "__main__":
