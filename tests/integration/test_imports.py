@@ -1,4 +1,4 @@
-from wof.domain.types import Set
+from wof.domain.model import Set
 from wof.import_logic import intensity_app
 
 from pathlib import Path

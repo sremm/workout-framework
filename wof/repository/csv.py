@@ -3,7 +3,7 @@ from typing import Dict, List, Union
 from uuid import UUID
 
 import pandas as pd
-from wof.domain.types import Session
+from wof.domain.model import Session
 from wof.repository.base import BaseRepository
 
 

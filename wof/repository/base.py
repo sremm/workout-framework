@@ -1,6 +1,6 @@
 from abc import ABC
 from uuid import UUID
-from wof.domain.types import Session
+from wof.domain.model import Session
 from typing import List
 
 

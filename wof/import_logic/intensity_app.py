@@ -1,5 +1,5 @@
 from pathlib import Path
-from wof.domain.types import Session, Set
+from wof.domain.model import Session, Set
 from typing import Dict, List
 from datetime import datetime
 

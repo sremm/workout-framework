@@ -1,7 +1,7 @@
 from typing import List, Set
 from uuid import UUID, uuid4
 
-from wof.domain.types import Session
+from wof.domain.model import Session
 from wof.repository.base import BaseRepository
 from wof.repository.csv import CSVRepository
 
