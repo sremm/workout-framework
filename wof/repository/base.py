@@ -10,3 +10,6 @@ class BaseRepository(ABC):
 
     def get(self, ids: List[UUID]) -> List[Session]:
         raise NotImplementedError
+
+    def list(self) -> List[Session]:
+        raise NotImplementedError

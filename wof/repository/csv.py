@@ -9,6 +9,7 @@ from wof.repository.base import BaseRepository
 
 class CSVRepository(BaseRepository):
     def __init__(self, path: Union[Path, None] = None) -> None:
+        self._data_path = path
         self._raw_data = pd.read_csv(path) if path is not None else pd.DataFrame()
         self._in_memory_data: Dict[UUID, Session] = {}
 
@@ -18,3 +19,6 @@ class CSVRepository(BaseRepository):
 
     def get(self, ids: List[UUID]) -> List[Session]:
         return [self._in_memory_data[id] for id in ids]
+
+    def list(self) -> List[Session]:
+        return list(self._in_memory_data.values())
