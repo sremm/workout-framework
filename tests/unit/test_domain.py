@@ -1,6 +1,5 @@
 from wof.domain.model import Session
 from wof.domain.model import Set
-from wof.domain.model import Exercise
 
 
 def test_add_sets_to_session():
