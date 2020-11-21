@@ -3,7 +3,7 @@ from wof.domain.types import Session
 from uuid import uuid4
 
 
-def test_repository_can_add_and_return_session():
+def test_csv_repository_can_add_and_return_session():
     repository = CSVRepository()
     session_id = uuid4()
     sessions_to_add = [Session(sets=[], id=session_id)]
