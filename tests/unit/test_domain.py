@@ -1,6 +1,6 @@
 from wof.domain.model import Session
 from wof.domain.model import Set
-from wof.domain.model import Excercise
+from wof.domain.model import Exercise
 
 
 def test_add_sets_to_session():
@@ -10,9 +10,8 @@ def test_add_sets_to_session():
     assert len(session) == 2
 
 
-def test_create_set_with_multiple_excercises():
+def test_create_set_with_multiple_exercises():
     a_set = Set(
-        excercises=[Excercise("first"), Excercise("second")],
+        exercise=[Exercise(0, "first"), Exercise(1, "second")],
     )
-
     assert len(a_set) == 2
