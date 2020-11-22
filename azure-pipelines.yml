@@ -17,7 +17,8 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    pip install pytest pytest-azurepipelines
+    pip install pytest 
     pip install pytest-cov
-    pytest
+    pip install pytest-azurepipelines
+    pytest --cov wof --cov-report html
   displayName: 'pytest'
