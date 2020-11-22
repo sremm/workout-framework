@@ -14,14 +14,13 @@ def _convert_to_sessions(data: pd.DataFrame) -> Dict[UUID, Session]:
         ids: List[str] = list(data["session_id"].unique())
         return {id: data[data["session_id"] == id] for id in ids}
 
+    data["date"] = pd.to_datetime(data["date"])
     grouped_data = _group_by_id(data)
     results = {}
     for id_hex, group_data in grouped_data.items():
         sets = _convert_rows_to_sets(group_data)
         session_id = UUID(id_hex)
-        session_date_time = datetime.strptime(
-            group_data["date"][0], "%Y-%m-%d %H:%M:%S.%f"
-        )
+        session_date_time = group_data["date"].iloc[0]
         session = Session(sets=sets, id=session_id, date_time=session_date_time)
         results[session_id] = session
     return results
@@ -101,4 +100,4 @@ class CSVRepository(BaseRepository):
             return pd.DataFrame.from_records(records)
 
         df = _convert_session_data()
-        df.to_csv(self._data_path)
+        df.to_csv(self._data_path, index=False)
