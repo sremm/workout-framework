@@ -4,6 +4,7 @@ from typing import Dict, List, Union
 from uuid import UUID
 
 import pandas as pd
+from pandas.errors import EmptyDataError
 from wof.domain.model import Session, WorkoutSet
 from wof.repository.base import BaseRepository
 
@@ -58,7 +59,7 @@ class CSVRepository(BaseRepository):
             else:
                 try:
                     df = pd.read_csv(path)
-                except pd.errors.EmptyDataError:
+                except EmptyDataError:
                     df = self._create_empty_data()
             return df
 
