@@ -18,7 +18,7 @@ class Exercise:
 
 
 @dataclass
-class Set:
+class WorkoutSet:
     """ Class to define a workout set """
 
     exercise: Union[str, List[str]] = "name"
@@ -40,11 +40,11 @@ class Set:
 class Session:
     """ Class for keeping track of session data """
 
-    sets: List[Set] = field(default_factory=list)
+    sets: List[WorkoutSet] = field(default_factory=list)
     id: UUID = field(default_factory=uuid4)
     date_time: datetime = field(default_factory=datetime.now)
 
-    def add_sets(self, sets: List[Set]) -> None:
+    def add_sets(self, sets: List[WorkoutSet]) -> None:
         self.sets.extend(sets)
 
     def __len__(self) -> int:

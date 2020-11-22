@@ -1,5 +1,5 @@
 from pathlib import Path
-from wof.domain.model import Session, Set
+from wof.domain.model import Session, WorkoutSet
 from typing import Dict, List
 from datetime import datetime
 
@@ -31,9 +31,9 @@ def _group_by_date(data: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     return {date: data[data["Date"] == date] for date in dates}
 
 
-def _convert_rows_to_sets(data: pd.DataFrame) -> List[Set]:
-    def _convert_row_to_set(row: pd.Series) -> Set:
-        return Set(
+def _convert_rows_to_sets(data: pd.DataFrame) -> List[WorkoutSet]:
+    def _convert_row_to_set(row: pd.Series) -> WorkoutSet:
+        return WorkoutSet(
             exercise=row["Exercise"],
             reps=row["Reps"],
             weights=row["Weight"],

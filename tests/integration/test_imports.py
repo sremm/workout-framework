@@ -1,4 +1,4 @@
-from wof.domain.model import Set
+from wof.domain.model import WorkoutSet
 from wof.import_logic import intensity_app
 
 from pathlib import Path
@@ -19,7 +19,7 @@ class TestImportFromIntensity:
         first_session = sessions_from_intensity[0]
         sets = first_session.sets
         assert sets == [
-            Set(
+            WorkoutSet(
                 "Single leg romanian deadlifts",
                 reps=12,
                 weights=50.0,
@@ -32,7 +32,7 @@ class TestImportFromIntensity:
         second_session = sessions_from_intensity[1]
         sets = second_session.sets
         assert sets == [
-            Set(
+            WorkoutSet(
                 "Tuck front lever",
                 reps=15,
                 weights=0.0,

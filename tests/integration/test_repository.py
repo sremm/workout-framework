@@ -1,7 +1,7 @@
 from typing import List, Set
 from uuid import UUID, uuid4
 
-from wof.domain.model import Session
+from wof.domain.model import Session, WorkoutSet
 from wof.repository.base import BaseRepository
 from wof.repository.csv import CSVRepository
 
@@ -40,6 +40,7 @@ class TestCSVRepository:
         # prep
         path = tmp_path / "data.csv"
         repository = CSVRepository(path)
+        sets = [WorkoutSet()]
         sessions = [Session()]
         # add
         repository.add(sessions)
