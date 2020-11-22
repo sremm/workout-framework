@@ -1,6 +1,6 @@
 from pathlib import Path
 from wof.domain.model import Session, WorkoutSet
-from typing import Dict, List
+from typing import Dict, List, Iterable
 from datetime import datetime
 
 import pandas as pd
@@ -27,7 +27,7 @@ def _convert_to_sessions(data: pd.DataFrame) -> List[Session]:
 
 
 def _group_by_date(data: pd.DataFrame) -> Dict[str, pd.DataFrame]:
-    dates: str = data["Date"].unique()
+    dates: Iterable = data["Date"].unique()
     return {date: data[data["Date"] == date] for date in dates}
 
 
