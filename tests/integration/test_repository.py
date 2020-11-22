@@ -41,7 +41,7 @@ class TestCSVRepository:
         path = tmp_path / "data.csv"
         repository = CSVRepository(path)
         sets = [WorkoutSet()]
-        sessions = [Session()]
+        sessions = [Session(sets)]
         # add
         repository.add(sessions)
         # save
