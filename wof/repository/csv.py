@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Iterable, List, Union
+from typing import Dict, List, Union
 from uuid import UUID
 
 import pandas as pd
