@@ -1,6 +1,6 @@
 from pathlib import Path
 from wof.domain.model import Session, WorkoutSet
-from typing import Dict, List, Iterable
+from typing import Dict, List
 from datetime import datetime
 
 import pandas as pd
