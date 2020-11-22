@@ -20,5 +20,5 @@ steps:
     pip install pytest 
     pip install pytest-cov
     pip install pytest-azurepipelines
-    pytest --cov wof --cov-report html
+    pytest --doctest-modules --cov=wof --cov-report=xml --cov-report=html
   displayName: 'pytest'
