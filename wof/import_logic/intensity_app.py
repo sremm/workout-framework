@@ -27,7 +27,7 @@ def _convert_to_sessions(data: pd.DataFrame) -> List[Session]:
 
 
 def _group_by_date(data: pd.DataFrame) -> Dict[str, pd.DataFrame]:
-    dates: Iterable = data["Date"].unique()
+    dates: List[str] = list(data["Date"].unique())
     return {date: data[data["Date"] == date] for date in dates}
 
 
