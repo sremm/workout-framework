@@ -1,23 +1,7 @@
-from typing import List, Set
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from wof.domain.model import Session, WorkoutSet
-from wof.repository.base import BaseRepository
 from wof.repository.csv import CSVRepository
-
-
-class FakeRepository(BaseRepository):
-    def __init__(self) -> None:
-        self._data: Set[Session] = set()
-
-    def add(self, sessions: List[Session]) -> None:
-        return self._data.update(sessions)
-
-    def get(self, ids: List[UUID]) -> List[Session]:
-        return [x for x in self._data if x.id in ids]
-
-    def list(self) -> List[Session]:
-        return list(self._data)
 
 
 class TestCSVRepository:
