@@ -15,6 +15,9 @@ class BaseRepository(ABC):
     def list(self) -> List[Session]:
         raise NotImplementedError
 
+    def commit(self) -> None:
+        raise NotImplementedError
+
 
 class FakeRepository(BaseRepository):
     def __init__(self) -> None:

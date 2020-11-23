@@ -79,7 +79,7 @@ class CSVRepository(BaseRepository):
     def list(self) -> List[Session]:
         return list(self._all_data.values())
 
-    def save(self) -> None:
+    def commit(self) -> None:
         def _initate_record() -> Dict:
             return {key: None for key in self._columns}
 

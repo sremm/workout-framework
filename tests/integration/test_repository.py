@@ -29,7 +29,7 @@ class TestCSVRepository:
         # add
         repository.add(sessions)
         # save
-        repository.save()
+        repository.commit()
         # load
         new_repository_instance = CSVRepository(path)
         loaded_sessions = new_repository_instance.list()
