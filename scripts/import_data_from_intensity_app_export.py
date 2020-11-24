@@ -6,7 +6,7 @@ import click
 from wof.import_logic import intensity_app
 from wof.repository.base import BaseRepository
 from wof.repository.csv import CSVRepository
-from wof import services
+from wof.service_layer import services
 
 import logging
 

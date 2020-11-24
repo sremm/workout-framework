@@ -1,5 +1,5 @@
 from wof.repository.base import FakeRepository
-from wof import services
+from wof.service_layer import services
 from wof.domain.model import Session, WorkoutSet
 
 
