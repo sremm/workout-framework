@@ -21,13 +21,16 @@ class BaseRepository(ABC):
 
 class FakeRepository(BaseRepository):
     def __init__(self) -> None:
-        self._data: Set[Session] = set()
+        self._data: List[Session] = []
 
     def add(self, sessions: List[Session]) -> None:
-        return self._data.update(sessions)
+        return self._data.extend(sessions)
 
     def get(self, ids: List[UUID]) -> List[Session]:
         return [x for x in self._data if x.id in ids]
 
     def list(self) -> List[Session]:
         return list(self._data)
+
+    def commit(self):
+        pass
