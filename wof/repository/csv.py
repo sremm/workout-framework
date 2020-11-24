@@ -72,6 +72,7 @@ class CSVRepository(BaseRepository):
     def add(self, sessions: List[Session]) -> None:
         session_by_id = {x.id: x for x in sessions}
         self._all_data.update(session_by_id)
+        self.committed = False
 
     def get(self, ids: List[UUID]) -> List[Session]:
         return [self._all_data[id] for id in ids]
@@ -101,3 +102,4 @@ class CSVRepository(BaseRepository):
 
         df = _convert_session_data()
         df.to_csv(self._data_path, index=False)
+        self.committed = True
