@@ -1,5 +1,4 @@
 """ Simple CLI to import data from intensity export file """
-from logging import log
 from pathlib import Path
 
 import click
