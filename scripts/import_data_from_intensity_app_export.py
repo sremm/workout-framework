@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 from wof.import_logic import intensity_app
 from wof.repository.base import BaseRepository
-from wof.repository.csv import CSVRepository
+from wof.repository.csv import CSVRepository, CSVSession
 from wof.service_layer import services
 
 import logging
@@ -26,8 +26,9 @@ def allocate_command(path_to_import: str, path_to_dataset: str):
     sessions = intensity_app.import_from_file(Path(path_to_import))
     logging.info(f"Sessions loaded from file: {path_to_import}")
     logging.info(f"Found {len(sessions)} unique sessions")
-    repository: BaseRepository = CSVRepository(Path(path_to_dataset))
-    services.allocate_in_batch(sessions, repository)
+    db_session = CSVSession(Path(path_to_dataset))
+    repository: BaseRepository = CSVRepository(db_session)
+    services.allocate_in_batch(sessions, repository, db_session)
     logging.info("Imported data added to repository")
 
 
