@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Union
 from uuid import UUID
@@ -39,7 +38,7 @@ def _convert_rows_to_sets(data: pd.DataFrame) -> List[WorkoutSet]:
     return list(data.apply(lambda row: _convert_row_to_set(row), axis=1))
 
 
-class CSVRepository(BaseRepository):
+class CSVSession:
     _columns = [
         "date",
         "session_id",
@@ -50,6 +49,7 @@ class CSVRepository(BaseRepository):
         "set_number",
         "unit",
     ]
+    committed = True
 
     def __init__(self, path: Union[Path, None] = None) -> None:
         def _load_data_if_exists(path) -> pd.DataFrame:
@@ -103,3 +103,17 @@ class CSVRepository(BaseRepository):
         df = _convert_session_data()
         df.to_csv(self._data_path, index=False)
         self.committed = True
+
+
+class CSVRepository(BaseRepository):
+    def __init__(self, session: CSVSession) -> None:
+        self.session = session
+
+    def add(self, sessions: List[WorkoutSession]) -> None:
+        self.session.add(sessions)
+
+    def get(self, ids: List[UUID]) -> List[WorkoutSession]:
+        return self.session.get(ids)
+
+    def list(self) -> List[WorkoutSession]:
+        return self.session.list()

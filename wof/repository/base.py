@@ -6,8 +6,6 @@ from wof.domain.model import WorkoutSession
 
 
 class BaseRepository(ABC):
-    committed = False
-
     def add(self, sessions: List[WorkoutSession]) -> None:
         raise NotImplementedError
 
@@ -21,12 +19,20 @@ class BaseRepository(ABC):
         raise NotImplementedError
 
 
+class FakeSession:
+    committed = False
+
+    def commit(self):
+        self.committed = True
+
+
 class FakeRepository(BaseRepository):
-    def __init__(self) -> None:
+    def __init__(self, session) -> None:
+        self.session = session
         self._data: List[WorkoutSession] = []
 
     def add(self, sessions: List[WorkoutSession]) -> None:
-        self.committed = False
+        self.session.committed = False
         return self._data.extend(sessions)
 
     def get(self, ids: List[UUID]) -> List[WorkoutSession]:
@@ -34,6 +40,3 @@ class FakeRepository(BaseRepository):
 
     def list(self) -> List[WorkoutSession]:
         return list(self._data)
-
-    def commit(self):
-        self.committed = True

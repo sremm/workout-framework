@@ -1,12 +1,13 @@
 from uuid import uuid4
 
 from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.repository.csv import CSVRepository
+from wof.repository.csv import CSVRepository, CSVSession
 
 
 class TestCSVRepository:
     def test_add_and_get(self):
-        repository = CSVRepository()
+        csv_session = CSVSession()
+        repository = CSVRepository(csv_session)
         session_id = uuid4()
         sessions_to_add = [WorkoutSession(id=session_id)]
         repository.add(sessions_to_add)
@@ -14,7 +15,8 @@ class TestCSVRepository:
         assert sessions_to_add == session_fetched
 
     def test_add_and_list(self):
-        repository = CSVRepository()
+        csv_session = CSVSession()
+        repository = CSVRepository(csv_session)
         sessions_to_add = [WorkoutSession()]
         repository.add(sessions_to_add)
         all_sessions = repository.list()
@@ -23,14 +25,16 @@ class TestCSVRepository:
     def test_add_save_and_load(self, tmp_path):
         # prep
         path = tmp_path / "data.csv"
-        repository = CSVRepository(path)
+        csv_session = CSVSession(path)
+        repository = CSVRepository(csv_session)
         sets = [WorkoutSet()]
         sessions = [WorkoutSession(sets)]
         # add
         repository.add(sessions)
         # save
-        repository.commit()
+        csv_session.commit()
         # load
-        new_repository_instance = CSVRepository(path)
+        new_csv_session = CSVSession(path)
+        new_repository_instance = CSVRepository(new_csv_session)
         loaded_sessions = new_repository_instance.list()
         assert sessions == loaded_sessions
