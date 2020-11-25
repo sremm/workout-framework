@@ -1,9 +1,9 @@
 from typing import List
 
-from wof.domain.model import Session
+from wof.domain.model import WorkoutSession
 from wof.repository.base import BaseRepository
 
 
-def allocate_in_batch(sessions: List[Session], repo: BaseRepository) -> None:
+def allocate_in_batch(sessions: List[WorkoutSession], repo: BaseRepository) -> None:
     repo.add(sessions)
     repo.commit()

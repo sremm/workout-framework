@@ -1,9 +1,9 @@
-from wof.domain.model import Session
+from wof.domain.model import WorkoutSession
 from wof.domain.model import WorkoutSet
 
 
 def test_add_sets_to_session():
-    session = Session()
+    session = WorkoutSession()
     sets = [WorkoutSet(), WorkoutSet()]
     session.add_sets(sets)
     assert len(session) == 2

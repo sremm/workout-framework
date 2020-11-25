@@ -1,12 +1,12 @@
 from pathlib import Path
-from wof.domain.model import Session, WorkoutSet
+from wof.domain.model import WorkoutSession, WorkoutSet
 from typing import Dict, List
 from datetime import datetime
 
 import pandas as pd
 
 
-def import_from_file(path: Path) -> List[Session]:
+def import_from_file(path: Path) -> List[WorkoutSession]:
     df = _load_export_file(path)
     return _convert_to_sessions(df)
 
@@ -15,13 +15,13 @@ def _load_export_file(path: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-def _convert_to_sessions(data: pd.DataFrame) -> List[Session]:
+def _convert_to_sessions(data: pd.DataFrame) -> List[WorkoutSession]:
     grouped_data = _group_by_date(data)
     sessions = []
     for date, group_data in grouped_data.items():
         sets = _convert_rows_to_sets(group_data)
         date_time = datetime.strptime(date, "%Y-%m-%d")
-        session = Session(sets=sets, date_time=date_time)
+        session = WorkoutSession(sets=sets, date_time=date_time)
         sessions.append(session)
     return sessions
 

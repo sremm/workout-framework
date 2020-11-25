@@ -5,11 +5,11 @@ from uuid import UUID
 
 import pandas as pd
 from pandas.errors import EmptyDataError
-from wof.domain.model import Session, WorkoutSet
+from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.repository.base import BaseRepository
 
 
-def _convert_to_sessions(data: pd.DataFrame) -> Dict[UUID, Session]:
+def _convert_to_sessions(data: pd.DataFrame) -> Dict[UUID, WorkoutSession]:
     def _group_by_id(data: pd.DataFrame) -> Dict[str, pd.DataFrame]:
         ids: List[str] = list(data["session_id"].unique())
         return {id: data[data["session_id"] == id] for id in ids}
@@ -21,7 +21,7 @@ def _convert_to_sessions(data: pd.DataFrame) -> Dict[UUID, Session]:
         sets = _convert_rows_to_sets(group_data)
         session_id = UUID(id_hex)
         session_date_time = group_data["date"].iloc[0]
-        session = Session(sets=sets, id=session_id, date_time=session_date_time)
+        session = WorkoutSession(sets=sets, id=session_id, date_time=session_date_time)
         results[session_id] = session
     return results
 
@@ -64,20 +64,20 @@ class CSVRepository(BaseRepository):
 
         self._data_path = path
         df = _load_data_if_exists(path)
-        self._all_data: Dict[UUID, Session] = _convert_to_sessions(df)
+        self._all_data: Dict[UUID, WorkoutSession] = _convert_to_sessions(df)
 
     def _create_empty_data(self) -> pd.DataFrame:
         return pd.DataFrame(columns=self._columns)
 
-    def add(self, sessions: List[Session]) -> None:
+    def add(self, sessions: List[WorkoutSession]) -> None:
         session_by_id = {x.id: x for x in sessions}
         self._all_data.update(session_by_id)
         self.committed = False
 
-    def get(self, ids: List[UUID]) -> List[Session]:
+    def get(self, ids: List[UUID]) -> List[WorkoutSession]:
         return [self._all_data[id] for id in ids]
 
-    def list(self) -> List[Session]:
+    def list(self) -> List[WorkoutSession]:
         return list(self._all_data.values())
 
     def commit(self) -> None:

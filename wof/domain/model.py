@@ -37,7 +37,7 @@ class WorkoutSet:
 
 
 @dataclass
-class Session:
+class WorkoutSession:
     """ Class for keeping track of session data """
 
     sets: List[WorkoutSet] = field(default_factory=list)

@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from wof.domain.model import Session, WorkoutSet
+from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.repository.csv import CSVRepository
 
 
@@ -8,14 +8,14 @@ class TestCSVRepository:
     def test_add_and_get(self):
         repository = CSVRepository()
         session_id = uuid4()
-        sessions_to_add = [Session(id=session_id)]
+        sessions_to_add = [WorkoutSession(id=session_id)]
         repository.add(sessions_to_add)
         session_fetched = repository.get([session_id])
         assert sessions_to_add == session_fetched
 
     def test_add_and_list(self):
         repository = CSVRepository()
-        sessions_to_add = [Session()]
+        sessions_to_add = [WorkoutSession()]
         repository.add(sessions_to_add)
         all_sessions = repository.list()
         assert sessions_to_add == all_sessions
@@ -25,7 +25,7 @@ class TestCSVRepository:
         path = tmp_path / "data.csv"
         repository = CSVRepository(path)
         sets = [WorkoutSet()]
-        sessions = [Session(sets)]
+        sessions = [WorkoutSession(sets)]
         # add
         repository.add(sessions)
         # save
