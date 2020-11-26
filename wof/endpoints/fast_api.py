@@ -1,11 +1,18 @@
 """ Simple api with FastAPI to interact with workout-framework """
 
+import logging
 from pathlib import Path
+from typing import List
 
-from fastapi import FastAPI
-from wof.repository.base import BaseRepository
-from wof.repository.csv import CSVRepository
+import uvicorn
+from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
+from wof.import_logic import intensity_app
+from wof.repository.base import BaseRepository
+from wof.repository.csv import CSVRepository, CSVSession
+from wof.service_layer import services
+
+logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
 
 
 class ExampleInput(BaseModel):
@@ -15,22 +22,20 @@ class ExampleInput(BaseModel):
 
 app = FastAPI()
 
-# initate repository
+# initate database session
 path_to_dataset = (
     Path(__file__).parent.parent.parent / "data" / "csv_dataset" / "data.csv"
 )
-repo: BaseRepository = CSVRepository(Path(path_to_dataset))
+db_session = CSVSession(path_to_dataset)
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+@app.post("/intensity_export")
+async def allococate_in_batch(file: UploadFile = File(...)):
+    sessions = intensity_app.import_from_file(file.file)
+    repo: BaseRepository = CSVRepository(db_session)
+    services.allocate_in_batch(sessions, repo, db_session)
+    return {"number_of_sessions": len(repo.list())}
 
-@app.get("/list_len")
-def list_repository():
-    return {"len": len(repo.list())}
 
-
-@app.post("/sessions")
-def allococate_in_batch(input: ExampleInput):
-    return input
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
