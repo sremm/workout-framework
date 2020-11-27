@@ -38,6 +38,13 @@ def _convert_rows_to_sets(data: pd.DataFrame) -> List[WorkoutSet]:
     return list(data.apply(lambda row: _convert_row_to_set(row), axis=1))
 
 
+def csv_session_factory(path):
+    def factory():
+        return CSVSession(path)
+
+    return factory
+
+
 class CSVSession:
     _columns = [
         "date",
