@@ -5,4 +5,6 @@ BACKEND_PORT = 8000
 
 
 def get_csv_database_path():
-    return Path(__file__).parent.parent / "data" / "csv_dataset" / "data.csv"
+    return (
+        Path(__file__).parent.parent / "data" / "csv_dataset" / "data.csv"
+    ).resolve()
