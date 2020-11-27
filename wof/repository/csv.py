@@ -59,6 +59,9 @@ class CSVSession:
     committed = True
 
     def __init__(self, path: Union[Path, None] = None) -> None:
+        self._load_data_and_set_path(path)
+
+    def _load_data_and_set_path(self, path: Union[Path, None] = None):
         def _load_data_if_exists(path) -> pd.DataFrame:
             if path is None or path.is_file() == False:
                 df = self._create_empty_data()
@@ -70,8 +73,9 @@ class CSVSession:
             return df
 
         self._data_path = path
-        df = _load_data_if_exists(path)
-        self._all_data: Dict[UUID, WorkoutSession] = _convert_to_sessions(df)
+        self._all_data: Dict[UUID, WorkoutSession] = _convert_to_sessions(
+            _load_data_if_exists(path)
+        )
 
     def _create_empty_data(self) -> pd.DataFrame:
         return pd.DataFrame(columns=self._columns)
@@ -112,8 +116,13 @@ class CSVSession:
         self.committed = True
 
     def close(self):
+        """ Clears path and in memory data"""
         self._data_path = None
         self._all_data = {}
+
+    def rollback(self):
+        """ Reloads from file """
+        self._load_data_and_set_path(self._data_path)
 
 
 class CSVRepository(BaseRepository):
