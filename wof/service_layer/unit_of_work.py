@@ -1,5 +1,9 @@
 import abc
+from typing import Callable
+
+from wof import config
 from wof.repository.base import BaseRepository
+from wof.repository.csv import csv_session_factory
 
 
 class AbstractUnitOfWork(abc.ABC):
@@ -17,9 +21,9 @@ class AbstractUnitOfWork(abc.ABC):
         raise NotImplementedError
 
 
-DEFAULT_SESSION_FACTORY = ""
+DEFAULT_SESSION_FACTORY = csv_session_factory(config.get_csv_database_path())
 
 
 class CSVUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, session_factory=DEFAULT_SESSION_FACTORY) -> None:
+    def __init__(self, session_factory: Callable = DEFAULT_SESSION_FACTORY) -> None:
         self.session_factory = session_factory
