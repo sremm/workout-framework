@@ -1,5 +1,6 @@
 pandas
 click
+requests
 fastapi
 uvicorn
 python-multipart
