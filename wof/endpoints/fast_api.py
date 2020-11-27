@@ -7,6 +7,7 @@ from typing import List
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
+from wof import config
 from wof.import_logic import intensity_app
 from wof.repository.base import BaseRepository
 from wof.repository.csv import CSVRepository, CSVSession
@@ -38,4 +39,4 @@ async def allococate_in_batch(file: UploadFile = File(...)):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=config.BACKEND_IP, port=config.BACKEND_PORT)
