@@ -111,6 +111,10 @@ class CSVSession:
         df.to_csv(self._data_path, index=False)
         self.committed = True
 
+    def close(self):
+        self._data_path = None
+        self._all_data = {}
+
 
 class CSVRepository(BaseRepository):
     def __init__(self, session: CSVSession) -> None:
