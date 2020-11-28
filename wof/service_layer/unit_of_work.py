@@ -2,7 +2,7 @@ import abc
 from typing import Callable
 
 import config
-from wof.adapters.repository import BaseRepository, FakeRepository, CSVRepository
+from wof.adapters.repository import BaseRepository, CSVRepository
 from wof.adapters.csv import CSVSession, csv_session_factory
 
 
@@ -23,22 +23,6 @@ class AbstractUnitOfWork(abc.ABC):
     @abc.abstractmethod
     def rollback(self):
         raise NotImplementedError
-
-
-class FakeUnitOfWork(AbstractUnitOfWork):
-    def __init__(self) -> None:
-        # self.db_session = FakeSession()
-        self.repo = FakeRepository(None)
-        self.commited = False
-
-    def __enter__(self):
-        pass
-
-    def commit(self):
-        self.commited = True
-
-    def rollback(self):
-        pass
 
 
 DEFAULT_SESSION_FACTORY = csv_session_factory(config.get_csv_database_path())
