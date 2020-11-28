@@ -27,7 +27,7 @@ db_session = CSVSession(path_to_dataset)
 async def allococate_in_batch(file: UploadFile = File(...)):
     sessions = intensity_app.import_from_file(file.file)
     repo: BaseRepository = CSVRepository(db_session)
-    services.allocate_in_batch(sessions, repo, db_session)
+    services.add_workout_sessions(sessions, repo, db_session)
     return {"number_of_sessions": len(repo.list())}
 
 

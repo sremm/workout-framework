@@ -28,7 +28,7 @@ def allocate_command(path_to_import: str, path_to_dataset: str):
     logging.info(f"Found {len(sessions)} unique sessions")
     db_session = CSVSession(Path(path_to_dataset))
     repository: BaseRepository = CSVRepository(db_session)
-    services.allocate_in_batch(sessions, repository, db_session)
+    services.add_workout_sessions(sessions, repository, db_session)
     logging.info("Imported data added to repository")
 
 
