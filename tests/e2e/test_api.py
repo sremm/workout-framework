@@ -1,14 +1,20 @@
-import requests
+import os
 import pytest
-
-import config
-
-
-def test_happy_path_returns_200():
-
-    assert 0
+from fastapi.testclient import TestClient
+from wof.entrypoints.fast_api_app import app
 
 
-def test_unhappy_path_returns_400_and_error_message():
+@pytest.fixture(scope="module")
+def test_app(tmp_path_factory):
+    tmp_path = tmp_path_factory.mktemp("csv_dataset")
+    os.environ["CSV_DATASET_PATH"] = str(tmp_path)
+    client = TestClient(app)
+    yield client
+    os.environ.pop("CSV_DATASET_PATH")
 
-    assert 0
+
+def test_get_sessions(test_app):
+    with test_app as client:  # this runs startup event
+        response = client.get("/sessions")
+        assert response.status_code == 200
+        assert response.json() == {"number_of_sessions": 0}

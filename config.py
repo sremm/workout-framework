@@ -1,18 +1,22 @@
-import os
 from pathlib import Path
+from pydantic import BaseSettings
 
 
-def get_api_host():
-    return os.environ.get("API_HOST", "localhost")
+class ApiSettings(BaseSettings):
+    api_host: str = "localhost"
+    api_port: int = 5005
 
 
-def get_api_port():
-    return 5005 if get_api_host() == "localhost" else 80
+api_settings = ApiSettings()
 
 
 def get_api_url() -> str:
-    return f"http://{get_api_host()}:{get_api_port()}"
+    return f"http://{api_settings.api_host}:{api_settings.api_port}"
 
 
 def get_csv_database_path() -> Path:
     return (Path(__file__).parent / "data" / "csv_dataset" / "data.csv").resolve()
+
+
+class DatabaseSettings(BaseSettings):
+    csv_dataset_path: Path = get_csv_database_path()

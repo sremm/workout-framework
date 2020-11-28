@@ -1,14 +1,12 @@
 """ Simple api with FastAPI to interact with workout-framework """
 
 import logging
-from pathlib import Path
 
+import config
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
-import config
-from wof.import_logic import intensity_app
-from wof.adapters.repository import BaseRepository
 from wof.adapters.repository import CSVRepository, CSVSession
+from wof.import_logic import intensity_app
 from wof.service_layer import services
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
@@ -16,20 +14,30 @@ logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=loggin
 
 app = FastAPI()
 
-# initate database session
-path_to_dataset = (
-    Path(__file__).parent.parent.parent / "data" / "csv_dataset" / "data.csv"
-)
-db_session = CSVSession(path_to_dataset)
+db = {}
+
+
+@app.on_event("startup")
+def startup():
+    """ Initialise database """
+    db_settings = config.DatabaseSettings()
+    db["session"] = CSVSession(db_settings.csv_dataset_path)
+    db["repo"] = CSVRepository(db["session"])
+
+
+@app.get("/sessions")
+async def number():
+    return {"number_of_sessions": len(db["repo"].list())}
 
 
 @app.post("/intensity_export")
-async def allococate_in_batch(file: UploadFile = File(...)):
-    sessions = intensity_app.import_from_file(file.file)
-    repo: BaseRepository = CSVRepository(db_session)
-    services.add_workout_sessions(sessions, repo, db_session)
-    return {"number_of_sessions": len(repo.list())}
+def allococate_in_batch(file: UploadFile = File(...)):
+    workout_sessions = intensity_app.import_from_file(file.file)
+    services.add_workout_sessions(workout_sessions, db["repo"], db["session"])
+    return {"number_of_sessions": len(db["repo"].list())}
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=config.get_api_host(), port=config.get_api_port())
+    uvicorn.run(
+        app, host=config.api_settings.api_host, port=config.api_settings.api_port
+    )
