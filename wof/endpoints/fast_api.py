@@ -7,7 +7,7 @@ import uvicorn
 from fastapi import FastAPI, File, UploadFile
 from wof import config
 from wof.import_logic import intensity_app
-from wof.adapters.base import BaseRepository
+from wof.adapters.repository import BaseRepository
 from wof.adapters.csv import CSVRepository, CSVSession
 from wof.service_layer import services
 
