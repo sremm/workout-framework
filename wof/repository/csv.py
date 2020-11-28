@@ -8,7 +8,7 @@ from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.repository.base import BaseRepository
 
 
-def _convert_to_sessions(data: pd.DataFrame) -> Dict[UUID, WorkoutSession]:
+def _convert_to_sessions(data: pd.DataFrame) -> Dict[str, WorkoutSession]:
     def _group_by_id(data: pd.DataFrame) -> Dict[str, pd.DataFrame]:
         ids: List[str] = list(data["session_id"].unique())
         return {id: data[data["session_id"] == id] for id in ids}
@@ -72,7 +72,7 @@ class CSVSession:
             return df
 
         self._data_path = path
-        self._all_data: Dict[UUID, WorkoutSession] = _convert_to_sessions(
+        self._all_data: Dict[str, WorkoutSession] = _convert_to_sessions(
             _load_data_if_exists(path)
         )
 
@@ -84,7 +84,7 @@ class CSVSession:
         self._all_data.update(session_by_id)
         self.committed = False
 
-    def get(self, ids: List[UUID]) -> List[WorkoutSession]:
+    def get(self, ids: List[str]) -> List[WorkoutSession]:
         return [self._all_data[id] for id in ids]
 
     def list(self) -> List[WorkoutSession]:
@@ -131,7 +131,7 @@ class CSVRepository(BaseRepository):
     def add(self, sessions: List[WorkoutSession]) -> None:
         self.session.add(sessions)
 
-    def get(self, ids: List[UUID]) -> List[WorkoutSession]:
+    def get(self, ids: List[str]) -> List[WorkoutSession]:
         return self.session.get(ids)
 
     def list(self) -> List[WorkoutSession]:

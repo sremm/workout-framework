@@ -9,7 +9,7 @@ class BaseRepository(ABC):
     def add(self, sessions: List[WorkoutSession]) -> None:
         raise NotImplementedError
 
-    def get(self, ids: List[UUID]) -> List[WorkoutSession]:
+    def get(self, ids: List[str]) -> List[WorkoutSession]:
         raise NotImplementedError
 
     def list(self) -> List[WorkoutSession]:
@@ -35,7 +35,7 @@ class FakeRepository(BaseRepository):
         self.session.committed = False
         return self._data.extend(sessions)
 
-    def get(self, ids: List[UUID]) -> List[WorkoutSession]:
+    def get(self, ids: List[str]) -> List[WorkoutSession]:
         return [x for x in self._data if x.id in ids]
 
     def list(self) -> List[WorkoutSession]:
