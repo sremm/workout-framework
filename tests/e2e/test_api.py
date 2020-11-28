@@ -13,8 +13,8 @@ def test_app(tmp_path_factory):
     os.environ.pop("CSV_DATASET_PATH")
 
 
-def test_get_sessions(test_app):
+def test_get_workout_sessions(test_app):
     with test_app as client:  # this runs startup event
-        response = client.get("/sessions")
+        response = client.get("/workout_sessions")
         assert response.status_code == 200
         assert response.json() == {"number_of_sessions": 0}

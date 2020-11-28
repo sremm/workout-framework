@@ -25,7 +25,7 @@ def startup():
     db["repo"] = CSVRepository(db["session"])
 
 
-@app.get("/sessions")
+@app.get("/workout_sessions")
 async def number():
     return {"number_of_sessions": len(db["repo"].list())}
 
