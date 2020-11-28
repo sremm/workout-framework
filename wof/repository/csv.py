@@ -16,9 +16,8 @@ def _convert_to_sessions(data: pd.DataFrame) -> Dict[UUID, WorkoutSession]:
     data["date"] = pd.to_datetime(data["date"])
     grouped_data = _group_by_id(data)
     results = {}
-    for id_hex, group_data in grouped_data.items():
+    for session_id, group_data in grouped_data.items():
         sets = _convert_rows_to_sets(group_data)
-        session_id = UUID(id_hex)
         session_date_time = group_data["date"].iloc[0]
         session = WorkoutSession(sets=sets, id=session_id, date_time=session_date_time)
         results[session_id] = session

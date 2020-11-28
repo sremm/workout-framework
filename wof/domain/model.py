@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Union, List
+from typing import Callable, Union, List
 
 from datetime import datetime
 from uuid import uuid4
@@ -36,12 +36,16 @@ class WorkoutSet:
             raise TypeError(f"Unexpected type for exercise: {type(self.exercise)}")
 
 
+def uuid4_as_str(*args) -> str:
+    return str(uuid4(*args))
+
+
 @dataclass
 class WorkoutSession:
     """ Class for keeping track of session data """
 
     sets: List[WorkoutSet] = field(default_factory=list)
-    id: UUID = field(default_factory=uuid4)
+    id: str = field(default_factory=uuid4_as_str)
     date_time: datetime = field(default_factory=datetime.now)
 
     def add_sets(self, sets: List[WorkoutSet]) -> None:
