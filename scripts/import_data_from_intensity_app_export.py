@@ -3,8 +3,8 @@ from pathlib import Path
 
 import click
 from wof.import_logic import intensity_app
-from wof.repository.base import BaseRepository
-from wof.repository.csv import CSVRepository, CSVSession
+from wof.adapters.base import BaseRepository
+from wof.adapters.csv import CSVRepository, CSVSession
 from wof.service_layer import services
 
 import logging

@@ -2,7 +2,7 @@ from typing import List
 from wof.service_layer.unit_of_work import AbstractUnitOfWork
 
 from wof.domain.model import WorkoutSession
-from wof.repository.base import BaseRepository
+from wof.adapters.base import BaseRepository
 
 
 def add_workout_sessions(

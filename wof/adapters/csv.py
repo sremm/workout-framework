@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 import pandas as pd
 from pandas.errors import EmptyDataError
 from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.repository.base import BaseRepository
+from wof.adapters.base import BaseRepository
 
 
 def _convert_to_sessions(data: pd.DataFrame) -> Dict[str, WorkoutSession]:

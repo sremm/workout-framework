@@ -1,5 +1,5 @@
 from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.repository.csv import CSVRepository, CSVSession
+from wof.adapters.csv import CSVRepository, CSVSession
 
 
 class TestCSVRepository:

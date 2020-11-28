@@ -1,4 +1,4 @@
-from wof.repository import base
+from wof.adapters import base
 from wof.service_layer import services
 from wof.domain.model import WorkoutSession
 from wof.service_layer.unit_of_work import FakeUnitOfWork

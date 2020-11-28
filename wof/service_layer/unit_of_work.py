@@ -2,8 +2,8 @@ import abc
 from typing import Callable
 
 from wof import config
-from wof.repository.base import BaseRepository, FakeSession, FakeRepository
-from wof.repository.csv import CSVRepository, CSVSession, csv_session_factory
+from wof.adapters.base import BaseRepository, FakeSession, FakeRepository
+from wof.adapters.csv import CSVRepository, CSVSession, csv_session_factory
 
 
 class AbstractUnitOfWork(abc.ABC):
