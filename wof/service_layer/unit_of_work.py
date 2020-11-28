@@ -1,7 +1,7 @@
 import abc
 from typing import Callable
 
-from wof import config
+import config
 from wof.adapters.repository import BaseRepository, FakeRepository, CSVRepository
 from wof.adapters.csv import CSVSession, csv_session_factory
 

@@ -1,6 +1,6 @@
 import requests
 import streamlit as st
-from wof import config
+import config
 
 st.title("Data Importer")
 
