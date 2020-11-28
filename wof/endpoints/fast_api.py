@@ -32,4 +32,4 @@ async def allococate_in_batch(file: UploadFile = File(...)):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=config.BACKEND_IP, port=config.BACKEND_PORT)
+    uvicorn.run(app, host=config.get_api_host(), port=config.get_api_port())

@@ -13,7 +13,7 @@ if st.button("Upload"):
             files = {"file": data_file}
             st.write("Starting upload")
             res = requests.post(
-                f"http://{config.BACKEND_IP}:{config.BACKEND_PORT}/intensity_export",
+                f"{config.get_api_url()}/intensity_export",
                 files=files,
             )
             st.write(res)
