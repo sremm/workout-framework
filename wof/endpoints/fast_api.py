@@ -2,11 +2,9 @@
 
 import logging
 from pathlib import Path
-from typing import List
 
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
-from pydantic import BaseModel
 from wof import config
 from wof.import_logic import intensity_app
 from wof.repository.base import BaseRepository
@@ -14,11 +12,6 @@ from wof.repository.csv import CSVRepository, CSVSession
 from wof.service_layer import services
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
-
-
-class ExampleInput(BaseModel):
-    name: str
-    price: float
 
 
 app = FastAPI()
