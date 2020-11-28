@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.repository.csv import CSVRepository, CSVSession
 
@@ -8,7 +6,7 @@ class TestCSVRepository:
     def test_add_and_get(self):
         csv_session = CSVSession()
         repository = CSVRepository(csv_session)
-        session_id = uuid4()
+        session_id = "abc123"
         sessions_to_add = [WorkoutSession(id=session_id)]
         repository.add(sessions_to_add)
         session_fetched = repository.get([session_id])
