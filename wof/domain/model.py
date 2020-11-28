@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Callable, Union, List
+from typing import Union, List
 
 from datetime import datetime
 from uuid import uuid4
-from uuid import UUID
 
 
 @dataclass

@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 from wof.import_logic import intensity_app
 from wof.adapters.repository import BaseRepository
-from wof.adapters.csv import CSVRepository, CSVSession
+from wof.adapters.repository import CSVRepository, CSVSession
 from wof.service_layer import services
 
 import logging

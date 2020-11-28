@@ -1,7 +1,7 @@
 from abc import ABC
-from typing import List, Set
-from uuid import UUID
+from typing import List
 
+from wof.adapters.csv import CSVSession
 from wof.domain.model import WorkoutSession
 
 
@@ -40,3 +40,17 @@ class FakeRepository(BaseRepository):
 
     def list(self) -> List[WorkoutSession]:
         return list(self._data)
+
+
+class CSVRepository(BaseRepository):
+    def __init__(self, session: CSVSession) -> None:
+        self.session = session
+
+    def add(self, sessions: List[WorkoutSession]) -> None:
+        self.session.add(sessions)
+
+    def get(self, ids: List[str]) -> List[WorkoutSession]:
+        return self.session.get(ids)
+
+    def list(self) -> List[WorkoutSession]:
+        return self.session.list()

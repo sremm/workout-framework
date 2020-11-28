@@ -4,7 +4,6 @@ from typing import Dict, List, Union
 import pandas as pd
 from pandas.errors import EmptyDataError
 from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.adapters.repository import BaseRepository
 
 
 def _convert_to_sessions(data: pd.DataFrame) -> Dict[str, WorkoutSession]:
@@ -121,17 +120,3 @@ class CSVSession:
     def rollback(self):
         """ Reloads from file """
         self._load_data_and_set_path(self._data_path)
-
-
-class CSVRepository(BaseRepository):
-    def __init__(self, session: CSVSession) -> None:
-        self.session = session
-
-    def add(self, sessions: List[WorkoutSession]) -> None:
-        self.session.add(sessions)
-
-    def get(self, ids: List[str]) -> List[WorkoutSession]:
-        return self.session.get(ids)
-
-    def list(self) -> List[WorkoutSession]:
-        return self.session.list()
