@@ -24,6 +24,7 @@ def add_sets_to_workout_session(
         workout_session = workout_sessions[0]
         workout_session.add_sets(sets)
         db_session.commit()
+        return sets
     else:
         if len(workout_sessions) == 0:
             raise InvalidSessionId(f"Found no workout sessions with {session_id=}")
@@ -31,6 +32,10 @@ def add_sets_to_workout_session(
             raise Exception(
                 f"Found {len(workout_sessions)} sessions with {session_id=}, but should only get one"
             )
+
+
+def list_all_sessions(repo: BaseRepository) -> List[WorkoutSession]:
+    return repo.list()
 
 
 # def add_workout_sessions(sessions: List[WorkoutSession], uow: AbstractUnitOfWork):
