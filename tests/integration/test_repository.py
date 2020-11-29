@@ -26,7 +26,7 @@ class TestCSVRepository:
         csv_session = CSVSession(path)
         repository = CSVRepository(csv_session)
         sets = [WorkoutSet()]
-        sessions = [WorkoutSession(sets)]
+        sessions = [WorkoutSession(sets=sets)]
         # add
         repository.add(sessions)
         # save

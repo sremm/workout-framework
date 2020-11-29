@@ -45,8 +45,8 @@ def test_add_set_to_existing_session():
     services.add_workout_sessions(sessions, repo, db_session)
 
     sets = [
-        WorkoutSet("name", reps=1, weights=0, set_number=1),
-        WorkoutSet("name", reps=1, weights=0, set_number=2),
+        WorkoutSet(exercise="name", reps=1, weights=0, set_number=1),
+        WorkoutSet(exercise="name", reps=1, weights=0, set_number=2),
     ]
     services.add_sets_to_workout_session(sets, session_id, repo, db_session)
 

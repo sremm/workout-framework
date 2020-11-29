@@ -20,7 +20,7 @@ class TestImportFromIntensity:
         sets = first_session.sets
         assert sets == [
             WorkoutSet(
-                "Single leg romanian deadlifts",
+                exercise="Single leg romanian deadlifts",
                 reps=12,
                 weights=50.0,
                 unit="kg",
@@ -33,7 +33,7 @@ class TestImportFromIntensity:
         sets = second_session.sets
         assert sets == [
             WorkoutSet(
-                "Tuck front lever",
+                exercise="Tuck front lever",
                 reps=15,
                 weights=0.0,
                 unit="kg",
