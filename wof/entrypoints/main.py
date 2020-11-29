@@ -26,7 +26,16 @@ def startup():
     db["repo"] = CSVRepository(db["session"])
 
 
-@app.put("/workout_sessions/{workout_session_id}")
+@app.put("/sets/{workout_session_id}")
+async def add_sets_to_workout_session(workout_session_id: str):
+    sets = []
+    services.add_sets_to_workout_session(
+        sets, workout_session_id, db["repo"], db["session"]
+    )
+    return {"msg": f"{len(sets)} set(s) added to workout session {workout_session_id}"}
+
+
+@app.post("/workout_sessions/{workout_session_id}", tags=["workout_sessions"])
 async def add_workout_sessions(workout_session_id: str):
     services.add_workout_sessions(
         [WorkoutSession(id=workout_session_id)], db["repo"], db["session"]
@@ -34,12 +43,12 @@ async def add_workout_sessions(workout_session_id: str):
     return {"workout_session_id": workout_session_id}
 
 
-@app.get("/workout_sessions")
+@app.get("/workout_sessions", tags=["workout_sessions"])
 async def number():
     return {"number_of_sessions": len(db["repo"].list())}
 
 
-@app.post("/intensity_export")
+@app.post("/intensity_export", tags=["workout_sessions"])
 def allococate_in_batch(file: UploadFile = File(...)):
     workout_sessions = intensity_app.import_from_file(file.file)
     services.add_workout_sessions(workout_sessions, db["repo"], db["session"])

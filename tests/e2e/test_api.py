@@ -18,10 +18,16 @@ def test_happy_path_add_session_add_sets_get_len(test_app):
     with test_app as client:  # this runs startup event
         # add an empty session
         workout_session_id = "123"
-        response = client.put(f"/workout_sessions/{workout_session_id}")
+        response = client.post(f"/workout_sessions/{workout_session_id}")
         assert response.status_code == 200
         assert response.json() == {"workout_session_id": workout_session_id}
 
         response = client.get("/workout_sessions")
         assert response.status_code == 200
         assert response.json() == {"number_of_sessions": 1}
+
+        response = client.put(f"/sets/{workout_session_id}")
+        assert response.status_code == 200
+        assert response.json() == {
+            "msg": f"1 set(s) added to workout session {workout_session_id}"
+        }
