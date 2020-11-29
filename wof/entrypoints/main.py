@@ -1,6 +1,7 @@
 """ Simple api with FastAPI to interact with workout-framework """
 
 import logging
+from wof.domain.model import WorkoutSession
 
 import config
 import uvicorn
@@ -23,6 +24,14 @@ def startup():
     db_settings = config.DatabaseSettings()
     db["session"] = CSVSession(db_settings.csv_dataset_path)
     db["repo"] = CSVRepository(db["session"])
+
+
+@app.put("/workout_sessions/{workout_session_id}")
+async def add_workout_sessions(workout_session_id: str):
+    services.add_workout_sessions(
+        [WorkoutSession(id=workout_session_id)], db["repo"], db["session"]
+    )
+    return {"workout_session_id": workout_session_id}
 
 
 @app.get("/workout_sessions")
