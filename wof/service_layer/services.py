@@ -17,6 +17,10 @@ class InvalidSessionId(Exception):
     pass
 
 
+class DuplicateSessions(Exception):
+    pass
+
+
 def add_sets_to_workout_session(
     sets: List[WorkoutSet], session_id: str, uow: AbstractUnitOfWork
 ):
@@ -26,14 +30,13 @@ def add_sets_to_workout_session(
             workout_session = workout_sessions[0]
             workout_session.add_sets(sets)
             uow.commit()
-            return sets
+        elif len(workout_sessions) == 0:
+            raise InvalidSessionId(f"Found no workout sessions with {session_id=}")
         else:
-            if len(workout_sessions) == 0:
-                raise InvalidSessionId(f"Found no workout sessions with {session_id=}")
-            else:
-                raise Exception(
-                    f"Found {len(workout_sessions)} sessions with {session_id=}, but should only get one"
-                )
+            raise DuplicateSessions(
+                f"Found {len(workout_sessions)} sessions with {session_id=}, but should only get one"
+            )
+    return sets
 
 
 def list_all_sessions(uow: AbstractUnitOfWork) -> List[WorkoutSession]:
