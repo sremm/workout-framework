@@ -1,7 +1,7 @@
 import abc
 from typing import Callable
 
-import config
+from config import DatabaseSettings
 from wof.adapters.repository import BaseRepository, CSVRepository
 from wof.adapters.csv import CSVSession, csv_session_factory
 
@@ -25,7 +25,8 @@ class AbstractUnitOfWork(abc.ABC):
         raise NotImplementedError
 
 
-DEFAULT_SESSION_FACTORY = csv_session_factory(config.get_csv_database_path())
+db_settings = DatabaseSettings()
+DEFAULT_SESSION_FACTORY = csv_session_factory(db_settings.csv_dataset_path)
 
 
 class CSVUnitOfWork(AbstractUnitOfWork):
