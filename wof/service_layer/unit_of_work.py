@@ -41,7 +41,6 @@ class CSVUnitOfWork(AbstractUnitOfWork):
 
     def __exit__(self, *args):
         super().__exit__()
-        self.db_session.close()
 
     def commit(self):
         self.db_session.commit()
