@@ -15,9 +15,6 @@ class BaseRepository(ABC):
     def list(self) -> List[WorkoutSession]:
         raise NotImplementedError
 
-    def commit(self) -> None:
-        raise NotImplementedError
-
 
 class CSVRepository(BaseRepository):
     def __init__(self, session: CSVSession) -> None:
