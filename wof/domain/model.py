@@ -39,6 +39,11 @@ class WorkoutSet(BaseModel):
             raise TypeError(f"Unexpected type for exercise: {type(self.exercise)}")
 
 
+class HeartRateSignal(BaseModel):
+    values: List[int]
+    time: List[datetime]
+
+
 def uuid4_as_str(*args) -> str:
     return str(uuid4(*args))
 
@@ -49,7 +54,7 @@ class WorkoutSession(BaseModel):
     sets: List[WorkoutSet] = Field(default_factory=list)
     id: str = Field(default_factory=uuid4_as_str)
     date_time: datetime = Field(default_factory=datetime.now)
-    # heart_rate: HeartRateSignal # could have HR signal here
+    heart_rate: Union[None, HeartRateSignal] = None
     # sections: BaseSection # Could have sections instead sets here
 
     def add_sets(self, sets: List[WorkoutSet]) -> None:

@@ -34,7 +34,6 @@ def test_happy_path_add_session_add_sets_get_len(test_app):
         assert response.status_code == 200
         assert response.json() == {"workout_session_id": workout_session_id}
 
-
         set_data_2: Dict = {
             "exercise": "name",
             "reps": 1,
@@ -59,5 +58,6 @@ def test_happy_path_add_session_add_sets_get_len(test_app):
             {
                 "sets": [set_data_1, set_data_2],
                 "id": workout_session_id,
+                "heart_rate": None,
             }
         ]
