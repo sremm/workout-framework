@@ -1,5 +1,6 @@
 from wof.domain.model import WorkoutSet
 from wof.import_logic import intensity_app
+from wof.import_logic import polar
 
 from pathlib import Path
 import pytest
@@ -40,3 +41,14 @@ class TestImportFromIntensity:
                 set_number=2,
             )
         ]
+
+
+@pytest.fixture
+def sessions_from_polar():
+    return []
+
+
+class TestImportFromPolar:
+    def test_number_of_sessions(self, sessions_from_polar):
+        number_of_sessions = len(sessions_from_polar)
+        assert number_of_sessions == 2
