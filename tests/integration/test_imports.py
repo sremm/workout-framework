@@ -45,7 +45,8 @@ class TestImportFromIntensity:
 
 @pytest.fixture
 def sessions_from_polar():
-    return []
+    path = Path("tests", "test_data", "polar")
+    return polar.load_all_sessions_in_folder(path)
 
 
 class TestImportFromPolar:
