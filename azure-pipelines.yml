@@ -13,12 +13,15 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
-    pip install -r requirements.txt
+    pip install poetry
+    poetry install
   displayName: 'Install dependencies'
 
 - script: |
-    pip install pytest 
-    pip install pytest-cov
-    pip install pytest-azurepipelines
-    pytest tests --cov=wof --cov-report=xml --cov-report=html
+    poetry pytest tests --cov=wof --cov-report=xml --cov-report=html
   displayName: 'pytest'
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
