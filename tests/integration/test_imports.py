@@ -65,4 +65,18 @@ class TestImportFromPolar:
                 datetime.strptime("2019-06-18T18:52:00", "%Y-%m-%dT%H:%M:%S"),
                 datetime.strptime("2019-06-18T18:52:01", "%Y-%m-%dT%H:%M:%S"),
             ],
+            unit="bpm",
+        )
+
+    def test_validate_second_session(self, sessions_from_polar):
+        first_session = sessions_from_polar[1]
+        hr = first_session.heart_rate
+        assert hr == TimeSeries(
+            values=[91, 92, 93],
+            time=[
+                datetime.strptime("2020-11-30T15:40:16", "%Y-%m-%dT%H:%M:%S"),
+                datetime.strptime("2020-11-30T15:40:17", "%Y-%m-%dT%H:%M:%S"),
+                datetime.strptime("2020-11-30T15:40:18", "%Y-%m-%dT%H:%M:%S"),
+            ],
+            unit="bpm",
         )
