@@ -1,5 +1,5 @@
 from datetime import datetime
-from wof.domain.model import HeartRateSignal, WorkoutSession, WorkoutSet
+from wof.domain.model import TimeSeries, WorkoutSet
 from wof.import_logic import intensity_app
 from wof.import_logic import polar
 
@@ -58,7 +58,7 @@ class TestImportFromPolar:
     def test_validate_first_session(self, sessions_from_polar):
         first_session = sessions_from_polar[0]
         hr = first_session.heart_rate
-        assert hr == HeartRateSignal(
+        assert hr == TimeSeries(
             values=[88, 89, 90],
             time=[
                 datetime.strptime("2019-06-18T18:51:59", "%Y-%m-%dT%H:%M:%S"),
