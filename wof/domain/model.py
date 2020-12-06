@@ -53,7 +53,7 @@ class WorkoutSession(BaseModel):
 
     sets: List[WorkoutSet] = Field(default_factory=list)
     id: str = Field(default_factory=uuid4_as_str)
-    date_time: datetime = Field(default_factory=datetime.now)
+    start_time: datetime = Field(default_factory=datetime.now)
     heart_rate: Union[None, TimeSeries] = None
     # sections: BaseSection # Could have sections instead sets here
 

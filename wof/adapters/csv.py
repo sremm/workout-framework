@@ -17,7 +17,7 @@ def _convert_to_sessions(data: pd.DataFrame) -> Dict[str, WorkoutSession]:
     for session_id, group_data in grouped_data.items():
         sets = _convert_rows_to_sets(group_data)
         session_date_time = group_data["date"].iloc[0]
-        session = WorkoutSession(sets=sets, id=session_id, date_time=session_date_time)
+        session = WorkoutSession(sets=sets, id=session_id, start_time=session_date_time)
         results[session_id] = session
     return results
 
@@ -97,7 +97,7 @@ class CSVSession:
             for session in self._all_data.values():
                 for cur_set in session.sets:
                     cur_record = _initate_record()
-                    cur_record["date"] = session.date_time
+                    cur_record["date"] = session.start_time
                     cur_record["session_id"] = session.id
                     cur_record["exercise_name"] = cur_set.exercise
                     cur_record["exercise_id"] = 0  # not implemented

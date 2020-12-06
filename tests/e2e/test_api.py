@@ -52,7 +52,7 @@ def test_happy_path_add_session_add_sets_get_len(test_app):
 
         response = client.get("/workout_sessions")
         results = response.json()
-        del results[0]["date_time"]
+        del results[0]["start_time"]
         assert response.status_code == 200
         assert results == [
             {
