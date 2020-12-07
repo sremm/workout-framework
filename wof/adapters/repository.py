@@ -5,7 +5,7 @@ from wof.adapters.csv import CSVSession
 from wof.domain.model import WorkoutSession
 
 
-class BaseRepository(ABC):
+class BaseWorkoutSessionRepository(ABC):
     def add(self, sessions: List[WorkoutSession]) -> None:
         raise NotImplementedError
 
@@ -16,7 +16,7 @@ class BaseRepository(ABC):
         raise NotImplementedError
 
 
-class CSVRepository(BaseRepository):
+class CSVWorkoutSessionRepository(BaseWorkoutSessionRepository):
     def __init__(self, session: CSVSession) -> None:
         self.session = session
 

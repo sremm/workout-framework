@@ -2,12 +2,15 @@ import abc
 from typing import Callable
 
 from config import DatabaseSettings
-from wof.adapters.repository import BaseRepository, CSVRepository
+from wof.adapters.repository import (
+    BaseWorkoutSessionRepository,
+    CSVWorkoutSessionRepository,
+)
 from wof.adapters.csv import CSVSession, csv_session_factory
 
 
 class AbstractUnitOfWork(abc.ABC):
-    repo: BaseRepository
+    repo: BaseWorkoutSessionRepository
 
     def __exit__(self, *args):
         self.rollback()
@@ -35,7 +38,7 @@ class CSVUnitOfWork(AbstractUnitOfWork):
 
     def __enter__(self):
         self.db_session: CSVSession = self.session_factory()
-        self.repo = CSVRepository(self.db_session)
+        self.repo = CSVWorkoutSessionRepository(self.db_session)
 
         # return super().__enter__()
 
