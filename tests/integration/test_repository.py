@@ -1,5 +1,16 @@
 from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.adapters.repository import CSVWorkoutSessionRepository, CSVSession
+from wof.adapters.repository import MongoDBWorkoutSessionRepository
+
+
+class TestMongoDBRepository:
+    def test_add_and_get(self):
+        repository = MongoDBWorkoutSessionRepository("session")
+        session_id = "abc123"
+        sessions_to_add = [WorkoutSession(id=session_id)]
+        repository.add(sessions_to_add)
+        session_fetched = repository.get([session_id])
+        assert sessions_to_add == session_fetched
 
 
 class TestCSVRepository:

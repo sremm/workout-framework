@@ -28,3 +28,17 @@ class CSVWorkoutSessionRepository(BaseWorkoutSessionRepository):
 
     def list(self) -> List[WorkoutSession]:
         return self.session.list()
+
+
+class MongoDBWorkoutSessionRepository(BaseWorkoutSessionRepository):
+    def __init__(self, session) -> None:
+        self.session = session
+
+    def add(self, sessions: List[WorkoutSession]) -> None:
+        self.session.add(sessions)
+
+    def get(self, ids: List[str]) -> List[WorkoutSession]:
+        return self.session.get(ids)
+
+    def list(self) -> List[WorkoutSession]:
+        return self.session.list()
