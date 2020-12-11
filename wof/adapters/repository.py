@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import List
+from wof.adapters.mongo_db import MongoSession
 
 from wof.adapters.csv import CSVSession
 from wof.domain.model import WorkoutSession
@@ -17,28 +18,28 @@ class BaseWorkoutSessionRepository(ABC):
 
 
 class CSVWorkoutSessionRepository(BaseWorkoutSessionRepository):
-    def __init__(self, session: CSVSession) -> None:
-        self.session = session
+    def __init__(self, db_session: CSVSession) -> None:
+        self.db_session = db_session
 
     def add(self, sessions: List[WorkoutSession]) -> None:
-        self.session.add(sessions)
+        self.db_session.add(sessions)
 
     def get(self, ids: List[str]) -> List[WorkoutSession]:
-        return self.session.get(ids)
+        return self.db_session.get(ids)
 
     def list(self) -> List[WorkoutSession]:
-        return self.session.list()
+        return self.db_session.list()
 
 
 class MongoDBWorkoutSessionRepository(BaseWorkoutSessionRepository):
-    def __init__(self, session) -> None:
-        self.session = session
+    def __init__(self, db_session: MongoSession) -> None:
+        self.db_session = db_session
 
     def add(self, sessions: List[WorkoutSession]) -> None:
-        self.session.add(sessions)
+        self.db_session.add(sessions)
 
     def get(self, ids: List[str]) -> List[WorkoutSession]:
-        return self.session.get(ids)
+        return self.db_session.get(ids)
 
     def list(self) -> List[WorkoutSession]:
-        return self.session.list()
+        return self.db_session.list()
