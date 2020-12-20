@@ -2,6 +2,7 @@ from wof.adapters.mongo_db import MongoSession
 from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.adapters.repository import CSVWorkoutSessionRepository, CSVSession
 from wof.adapters.repository import MongoDBWorkoutSessionRepository
+from datetime import datetime
 
 
 class TestMongoDBRepository:
@@ -10,8 +11,12 @@ class TestMongoDBRepository:
         repository = MongoDBWorkoutSessionRepository(mongo_session)
         session_id = "abc123"
         sessions_to_add = [WorkoutSession(id=session_id)]
-        repository.add(sessions_to_add)
-        session_fetched = repository.get([session_id])
+        added_session_ids = repository.add(sessions_to_add)
+        session_fetched = repository.get(added_session_ids)
+        # truncate time since mongo db does that
+        sessions_to_add[0].start_time = datetime.strptime(
+            str(sessions_to_add[0].start_time)[:-3], "%Y-%m-%d %H:%M:%S.%f"
+        )
         assert sessions_to_add == session_fetched
 
     def test_add_and_list(self):

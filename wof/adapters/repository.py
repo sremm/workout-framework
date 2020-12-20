@@ -35,8 +35,8 @@ class MongoDBWorkoutSessionRepository(BaseWorkoutSessionRepository):
     def __init__(self, db_session: MongoSession) -> None:
         self.db_session = db_session
 
-    def add(self, sessions: List[WorkoutSession]) -> None:
-        self.db_session.add(sessions)
+    def add(self, sessions: List[WorkoutSession]) -> List:
+        return self.db_session.add(sessions)
 
     def get(self, ids: List[str]) -> List[WorkoutSession]:
         return self.db_session.get(ids)
