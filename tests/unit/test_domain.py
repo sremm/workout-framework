@@ -1,5 +1,7 @@
-from wof.domain.model import WorkoutSession
+from datetime import datetime
+from wof.domain.model import TimeSeries, WorkoutSession
 from wof.domain.model import WorkoutSet
+from typing import List
 
 
 def test_add_sets_to_session():
@@ -14,3 +16,17 @@ def test_create_set_with_multiple_exercises():
         exercise=["first", "second"],
     )
     assert len(a_set) == 2
+
+
+def test_create_session_with_hr_data():
+    session = WorkoutSession()
+
+    time: List[datetime] = [
+        datetime(2000, 1, 1, 15, 0, 0, 0),
+        datetime(2000, 1, 1, 15, 0, 1, 0),
+        datetime(2000, 1, 1, 15, 0, 2, 0),
+    ]
+    hr_data = TimeSeries(values=[1, 2, 3], time=time, unit="kg")
+    session.update_heart_rate(hr_data)
+
+    assert session.heart_rate == hr_data

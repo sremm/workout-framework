@@ -61,6 +61,9 @@ class WorkoutSession(BaseModel):
 
     def add_sets(self, sets: List[WorkoutSet]) -> None:
         self.sets.extend(sets)
+    
+    def update_heart_rate(self, data:TimeSeries) -> None:
+        self.heart_rate = data
 
     def __len__(self) -> int:
         return len(self.sets)
