@@ -9,7 +9,7 @@ from wof.adapters.repository import (
     CSVWorkoutSessionRepository,
     MongoDBWorkoutSessionRepository,
 )
-from wof.domain.model import WorkoutSession, WorkoutSet
+from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
 
 
 @pytest.fixture
@@ -33,18 +33,33 @@ def mongo_test_db():
         os.environ.pop(key)
 
 
+def create_timeseries_entry() -> TimeSeries:
+    time = [
+        datetime(2000, 1, 1, 15, 0, 0, 0),
+        datetime(2000, 1, 1, 15, 0, 1, 0),
+        datetime(2000, 1, 1, 15, 0, 2, 0),
+    ]
+    return TimeSeries(values=[1, 2, 3], time=time, unit="bpm")
+
+
 class TestMongoDBRepository:
     def test_add_and_get(self, mongo_test_db):
+        # connect to db
         mongo_session = MongoSession()
         repository = MongoDBWorkoutSessionRepository(mongo_session)
-        session_id = "abc123"
-        sessions_to_add = [WorkoutSession(id=session_id)]
+        # populate with desired values
+        workout_session = WorkoutSession()
+        workout_session.start_time = datetime.strptime(
+            str(workout_session.start_time)[:-3], "%Y-%m-%d %H:%M:%S.%f"
+        )  # since mongodb truncates to milliseconds from microseconds
+
+        workout_session.update_heart_rate(create_timeseries_entry())
+        sessions_to_add = [workout_session]
+
+        # add to db
         added_session_ids = repository.add(sessions_to_add)
+        # get for db
         session_fetched = repository.get(added_session_ids)
-        # truncate time since mongo db does that
-        sessions_to_add[0].start_time = datetime.strptime(
-            str(sessions_to_add[0].start_time)[:-3], "%Y-%m-%d %H:%M:%S.%f"
-        )
         assert sessions_to_add == session_fetched
 
     def test_add_and_list(self, mongo_test_db):
