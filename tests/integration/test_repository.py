@@ -1,12 +1,40 @@
-from wof.adapters.mongo_db import MongoSession
-from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.adapters.repository import CSVWorkoutSessionRepository, CSVSession
-from wof.adapters.repository import MongoDBWorkoutSessionRepository
+import os
 from datetime import datetime
+
+import pytest
+from pymongo import MongoClient
+from wof.adapters.mongo_db import MongoSession, MongoSettings
+from wof.adapters.repository import (
+    CSVSession,
+    CSVWorkoutSessionRepository,
+    MongoDBWorkoutSessionRepository,
+)
+from wof.domain.model import WorkoutSession, WorkoutSet
+
+
+@pytest.fixture
+def mongo_test_db():
+    # set env vars for MongoSettings
+    evars = {
+        "MONGO_DATABASE": "test_db",
+        "MONGO_PORT": "27017",
+        "MONGO_HOST": "localhost",
+    }
+    for key, val in evars.items():
+        os.environ[key] = val
+    yield 1
+    # clear test database
+    mongo_settings = MongoSettings()
+    client = MongoClient(mongo_settings.mongo_host, mongo_settings.mongo_port)
+    collection = client[mongo_settings.mongo_database][mongo_settings.main_collection]
+    collection.drop()
+    # remove environment variables
+    for key, val in evars.items():
+        os.environ.pop(key)
 
 
 class TestMongoDBRepository:
-    def test_add_and_get(self):
+    def test_add_and_get(self, mongo_test_db):
         mongo_session = MongoSession()
         repository = MongoDBWorkoutSessionRepository(mongo_session)
         session_id = "abc123"
@@ -19,27 +47,34 @@ class TestMongoDBRepository:
         )
         assert sessions_to_add == session_fetched
 
-    def test_add_and_list(self):
+    def test_add_and_list(self, mongo_test_db):
         mongo_session = MongoSession()
         repository = MongoDBWorkoutSessionRepository(mongo_session)
         sessions_to_add = [WorkoutSession()]
         repository.add(sessions_to_add)
         all_sessions = repository.list()
+        # truncate time since mongo db does that
+        sessions_to_add[0].start_time = datetime.strptime(
+            str(sessions_to_add[0].start_time)[:-3], "%Y-%m-%d %H:%M:%S.%f"
+        )
         assert sessions_to_add == all_sessions
 
-    def test_add_save_and_load(self):
+    def test_add_save_and_load(self, mongo_test_db):
         #
         mongo_session = MongoSession()
         repository = MongoDBWorkoutSessionRepository(mongo_session)
         sets = [WorkoutSet()]
         sessions = [WorkoutSession(sets=sets)]
+        sessions[0].start_time = datetime.strptime(
+            str(sessions[0].start_time)[:-3], "%Y-%m-%d %H:%M:%S.%f"
+        )
         # add
         repository.add(sessions)
         # save
-        mongo_session.commit()
+        # mongo_session.commit()
         # close session?
+        mongo_session.close()
         # repopen session?
-        # load
         new_mongo_session = MongoSession()
         new_repository_instance = MongoDBWorkoutSessionRepository(new_mongo_session)
         loaded_sessions = new_repository_instance.list()

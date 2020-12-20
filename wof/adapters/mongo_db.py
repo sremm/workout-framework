@@ -11,22 +11,27 @@ from wof.domain.model import WorkoutSession
 
 # could go to config later
 class MongoSettings(BaseSettings):
-    host: str = "localhost"
-    port: int = 27017
-    database: str = "test_db"
+    mongo_host: str = "localhost"
+    mongo_port: int = 27017
+    mongo_database: str = "test_db"
+    main_collection: str = "workout_sessions"
 
 
 class MongoSession:
     def __init__(self) -> None:
         self._mongo_settings = MongoSettings()
-        self._client = MongoClient(self._mongo_settings.host, self._mongo_settings.port)
-        self._db = self._client[self._mongo_settings.database]
-        self._collection = self._db["workout_sessions"]
+        self._client = MongoClient(
+            self._mongo_settings.mongo_host, self._mongo_settings.mongo_port
+        )
+        self._db = self._client[self._mongo_settings.mongo_database]
+        self._collection = self._db[self._mongo_settings.main_collection]
 
     def add(self, sessions: List[WorkoutSession]) -> List:
         added_ids = []
         for session in sessions:
-            r = self._db["workout_sessions"].insert_one(session.dict())
+            r = self._db[self._mongo_settings.main_collection].insert_one(
+                session.dict()
+            )
             added_ids.append(str(r.inserted_id))
         return added_ids
 
@@ -39,13 +44,13 @@ class MongoSession:
         return result
 
     def list(self) -> List[WorkoutSession]:
-        return []
+        return [WorkoutSession(**x) for x in self._collection.find()]
 
     def commit(self) -> None:
         self.committed = True
 
     def close(self):
-        pass
+        self._client.close()
 
     def rollback(self):
         pass
