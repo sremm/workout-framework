@@ -26,7 +26,7 @@ def test_create_session_with_hr_data():
         datetime(2000, 1, 1, 15, 0, 1, 0),
         datetime(2000, 1, 1, 15, 0, 2, 0),
     ]
-    hr_data = TimeSeries(values=[1, 2, 3], time=time, unit="kg")
+    hr_data = TimeSeries(values=[1, 2, 3], time=time, unit="bpm")
     session.update_heart_rate(hr_data)
 
     assert session.heart_rate == hr_data
