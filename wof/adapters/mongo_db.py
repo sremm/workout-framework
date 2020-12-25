@@ -1,6 +1,6 @@
 """ Stuff for handling MongoDB specifics"""
 
-from typing import List, Union
+from typing import List, Union, Dict
 
 from bson.objectid import ObjectId
 from pydantic import BaseSettings
@@ -32,34 +32,48 @@ class MongoSession:
         self._client = MongoClient(
             self._mongo_settings.mongo_host, self._mongo_settings.mongo_port
         )
+        # start session and transaction
+        self._uncommited: Dict[Dict] = {}
+        self._commited: bool = True
         self._db = self._client[self._mongo_settings.mongo_database]
         self._collection = self._db[self._mongo_settings.main_collection]
 
     def add(self, sessions: List[WorkoutSession]) -> List:
         added_ids = []
         for session in sessions:
-            r = self._db[self._mongo_settings.main_collection].insert_one(
-                session.dict()
-            )
-            added_ids.append(str(r.inserted_id))
+            session_dict = session.dict()
+            session_dict["_id"] = session_dict["id"]
+            self._uncommited[session_dict["_id"]] = session_dict
+            added_ids.append(session_dict["_id"])
+        self.committed = False
         return added_ids
 
     def get(self, ids: List[str]) -> List[WorkoutSession]:
         result = []
         for _id in ids:
-            result.append(
-                WorkoutSession(**self._collection.find_one({"_id": ObjectId(_id)}))
-            )
+            document = self._collection.find_one({"_id": ObjectId(_id)})
+            if document is None:
+                # check if in uncommmitted
+                if _id in self._uncommited.keys():
+                    result.append(WorkoutSession(**self._uncommited[_id]))
+            else:
+                result.append(WorkoutSession(**document))
+
         return result
 
     def list(self) -> List[WorkoutSession]:
-        return [WorkoutSession(**x) for x in self._collection.find()]
+        return [WorkoutSession(**x) for x in self._collection.find()] + [
+            WorkoutSession(**x) for x in self._uncommited.values()
+        ]
 
     def commit(self) -> None:
+        for session_dict in self._uncommited.values():
+            session_dict["_id"] = ObjectId(session_dict["_id"])
+            r = self._collection.insert_one(session_dict)
         self.committed = True
 
     def close(self):
         self._client.close()
 
     def rollback(self):
-        pass
+        self._uncommited = {}

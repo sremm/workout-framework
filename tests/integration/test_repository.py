@@ -68,10 +68,6 @@ class TestMongoDBRepository:
         sessions_to_add = [WorkoutSession()]
         repository.add(sessions_to_add)
         all_sessions = repository.list()
-        # truncate time since mongo db does that
-        sessions_to_add[0].start_time = datetime.strptime(
-            str(sessions_to_add[0].start_time)[:-3], "%Y-%m-%d %H:%M:%S.%f"
-        )
         assert sessions_to_add == all_sessions
 
     def test_add_save_and_load(self, mongo_test_db):
@@ -86,8 +82,7 @@ class TestMongoDBRepository:
         # add
         repository.add(sessions)
         # save
-        # mongo_session.commit()
-        # close session?
+        mongo_session.commit()
         mongo_session.close()
         # repopen session?
         new_mongo_session = MongoSession()

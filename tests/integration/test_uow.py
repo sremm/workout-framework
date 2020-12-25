@@ -1,11 +1,13 @@
-from wof.service_layer.unit_of_work import CSVUnitOfWork, MongoUnitOfWork
 import os
-from wof.adapters.mongo_db import MongoSettings, mongo_session_factory
+from datetime import datetime
+from typing import List
+
+import pytest
 from pymongo import MongoClient
 from wof.adapters.csv import csv_session_factory
+from wof.adapters.mongo_db import MongoSettings, mongo_session_factory
 from wof.domain import model
-import pytest
-from datetime import datetime
+from wof.service_layer.unit_of_work import CSVUnitOfWork, MongoUnitOfWork
 
 
 @pytest.fixture
@@ -33,9 +35,7 @@ class TestMongoUoW:
     def test_uow_can_add_workout_sessions(self, mongo_session_factory_instance):
         uow = MongoUnitOfWork(mongo_session_factory_instance)
         with uow:
-            workout_sessions = [
-                model.WorkoutSession(id="abc123", sets=[model.WorkoutSet()])
-            ]
+            workout_sessions = [model.WorkoutSession(sets=[model.WorkoutSet()])]
             workout_sessions[0].start_time = datetime.strptime(
                 str(workout_sessions[0].start_time)[:-3], "%Y-%m-%d %H:%M:%S.%f"
             )  # since mongodb truncates to milliseconds from microseconds
@@ -44,11 +44,42 @@ class TestMongoUoW:
         fetched_session = uow.repo.get(added_session_ids)
         assert fetched_session == workout_sessions
 
-    def test_rolls_back_uncommited_work_by_default(self):
-        assert 0
+    def test_rolls_back_uncommited_work_by_default(
+        self, mongo_session_factory_instance
+    ):
+        uow = MongoUnitOfWork(mongo_session_factory_instance)
+        with uow:
+            workout_sessions = [
+                model.WorkoutSession(id="abc123", sets=[model.WorkoutSet()])
+            ]
+            workout_sessions[0].start_time = datetime.strptime(
+                str(workout_sessions[0].start_time)[:-3], "%Y-%m-%d %H:%M:%S.%f"
+            )  # since mongodb truncates to milliseconds from microseconds
+            uow.repo.add(workout_sessions)
+        session_list = uow.repo.list()
+        assert session_list == []
 
-    def test_rolls_back_on_exception(self):
-        assert 0
+    def test_rolls_back_on_exception(self, mongo_session_factory_instance):
+        uow = MongoUnitOfWork(mongo_session_factory_instance)
+
+        class MyException(Exception):
+            pass
+
+        try:
+            with uow:
+                workout_sessions = [
+                    model.WorkoutSession(id="abc123", sets=[model.WorkoutSet()])
+                ]
+                workout_sessions[0].start_time = datetime.strptime(
+                    str(workout_sessions[0].start_time)[:-3], "%Y-%m-%d %H:%M:%S.%f"
+                )  # since mongodb truncates to milliseconds from microseconds
+                uow.repo.add(workout_sessions)
+                raise MyException()
+        except MyException:
+            pass
+
+        session_list = uow.repo.list()
+        assert session_list == []
 
 
 @pytest.fixture
