@@ -16,6 +16,7 @@ steps:
     pip install poetry
     poetry config virtualenvs.create false
     poetry install
+    poetry add -D pytest-azurepipelines
   displayName: 'Install dependencies'
 
 - script: |
