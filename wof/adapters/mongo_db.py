@@ -1,6 +1,6 @@
 """ Stuff for handling MongoDB specifics"""
 
-from typing import Dict, List
+from typing import List, Union
 
 from bson.objectid import ObjectId
 from pydantic import BaseSettings
@@ -17,9 +17,18 @@ class MongoSettings(BaseSettings):
     main_collection: str = "workout_sessions"
 
 
+def mongo_session_factory(mongo_settings: MongoSettings):
+    def factory():
+        return MongoSession(mongo_settings)
+
+    return factory
+
+
 class MongoSession:
-    def __init__(self) -> None:
-        self._mongo_settings = MongoSettings()
+    def __init__(self, mongo_settings: Union[None, MongoSettings] = None) -> None:
+        self._mongo_settings = (
+            MongoSettings() if mongo_settings is None else mongo_settings
+        )
         self._client = MongoClient(
             self._mongo_settings.mongo_host, self._mongo_settings.mongo_port
         )
