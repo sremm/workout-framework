@@ -6,6 +6,7 @@ Series x Sets x Reps of Excercies
 from datetime import datetime
 from typing import List, Union
 from uuid import uuid4
+from bson.objectid import ObjectId
 
 from pydantic import BaseModel, Field
 
@@ -49,11 +50,15 @@ def uuid4_as_str(*args) -> str:
     return str(uuid4(*args))
 
 
+def object_id_as_str(*args) -> str:
+    return str(ObjectId(*args))
+
+
 class WorkoutSession(BaseModel):
     """ Class for keeping track of session data """
 
     sets: List[WorkoutSet] = Field(default_factory=list)
-    id: str = Field(default_factory=uuid4_as_str)
+    id: str = Field(default_factory=object_id_as_str)
     start_time: datetime = Field(default_factory=datetime.now)
     stop_time: Union[None, datetime] = None
     heart_rate: Union[None, TimeSeries] = None
@@ -61,8 +66,8 @@ class WorkoutSession(BaseModel):
 
     def add_sets(self, sets: List[WorkoutSet]) -> None:
         self.sets.extend(sets)
-    
-    def update_heart_rate(self, data:TimeSeries) -> None:
+
+    def update_heart_rate(self, data: TimeSeries) -> None:
         self.heart_rate = data
 
     def __len__(self) -> int:
