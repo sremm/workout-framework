@@ -1,10 +1,12 @@
 import abc
 from typing import Callable
+from wof.adapters.mongo_db import MongoSession
 
 from config import DatabaseSettings
 from wof.adapters.repository import (
     BaseWorkoutSessionRepository,
     CSVWorkoutSessionRepository,
+    MongoDBWorkoutSessionRepository,
 )
 from wof.adapters.csv import CSVSession, csv_session_factory
 
@@ -26,6 +28,27 @@ class AbstractUnitOfWork(abc.ABC):
     @abc.abstractmethod
     def rollback(self):
         raise NotImplementedError
+
+
+MONGO_SESSION_FACTORY = ""
+
+
+class MongoUnitOfWork(AbstractUnitOfWork):
+    def __init__(self, session_factory: Callable = MONGO_SESSION_FACTORY) -> None:
+        self.session_factory = session_factory
+
+    def __enter__(self):
+        self.db_session: MongoSession = self.session_factory()
+        self.repo = MongoDBWorkoutSessionRepository(self.db_session)
+
+    def __exit__(self, *args):
+        super().__exit__()
+
+    def commit(self):
+        self.db_session.commit()
+
+    def rollback(self):
+        self.db_session.rollback()
 
 
 db_settings = DatabaseSettings()
