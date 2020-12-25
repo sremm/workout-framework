@@ -24,7 +24,6 @@ mypy = "^0.790"
 pylint = "^2.6.0"
 pytest = "^6.1.2"
 pytest-cov = "^2.10.1"
-pytest-azurepipelines = "^0.8.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
