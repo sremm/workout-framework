@@ -12,13 +12,16 @@ steps:
   displayName: 'Use Python 3.8'
 
 - script: |
-    sudo systemctl start mongod
     python -m pip install --upgrade pip
     pip install poetry
     poetry config virtualenvs.create false
     poetry install
   displayName: 'Install dependencies'
 
+- script: |
+    sudo systemctl start mongod
+  displayName: Start MongoDB
+  
 - script: |
     poetry run pytest tests --cov=wof --cov-report=xml --cov-report=html
   displayName: 'pytest'
