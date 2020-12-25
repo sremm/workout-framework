@@ -46,4 +46,5 @@ def load_all_sessions_in_folder(path: Path) -> List[WorkoutSession]:
         with session_file_path.open("r") as f:
             data = json.load(f)
         results.append(_convert_to_workout_session(data))
+    results.sort()
     return results
