@@ -5,7 +5,7 @@ from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.service_layer import services, unit_of_work
 
 
-class FakeRepository(repository.BaseRepository):
+class FakeRepository(repository.BaseWorkoutSessionRepository):
     def __init__(self) -> None:
         self._data: List[WorkoutSession] = []
 

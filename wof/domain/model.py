@@ -6,6 +6,8 @@ Series x Sets x Reps of Excercies
 from datetime import datetime
 from typing import List, Union
 from uuid import uuid4
+from bson.objectid import ObjectId
+from functools import total_ordering
 
 from pydantic import BaseModel, Field
 
@@ -49,11 +51,16 @@ def uuid4_as_str(*args) -> str:
     return str(uuid4(*args))
 
 
+def object_id_as_str(*args) -> str:
+    return str(ObjectId(*args))
+
+
+@total_ordering
 class WorkoutSession(BaseModel):
     """ Class for keeping track of session data """
 
     sets: List[WorkoutSet] = Field(default_factory=list)
-    id: str = Field(default_factory=uuid4_as_str)
+    id: str = Field(default_factory=object_id_as_str)
     start_time: datetime = Field(default_factory=datetime.now)
     stop_time: Union[None, datetime] = None
     heart_rate: Union[None, TimeSeries] = None
@@ -62,8 +69,17 @@ class WorkoutSession(BaseModel):
     def add_sets(self, sets: List[WorkoutSet]) -> None:
         self.sets.extend(sets)
 
+    def update_heart_rate(self, data: TimeSeries) -> None:
+        self.heart_rate = data
+
     def __len__(self) -> int:
         return len(self.sets)
+
+    def __lt__(self, other) -> bool:
+        return self.start_time < other.start_time
+
+    def __eq__(self, other) -> bool:
+        return super().__eq__(other)
 
 
 # might not quite work to validate and reconstuct, don't know yet

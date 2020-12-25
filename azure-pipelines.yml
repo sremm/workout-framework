@@ -16,12 +16,18 @@ steps:
     pip install poetry
     poetry config virtualenvs.create false
     poetry install
+    poetry add -D pytest-azurepipelines
   displayName: 'Install dependencies'
 
 - script: |
-    poetry run pytest tests --cov=wof --cov-report=xml --cov-report=html
+    sudo systemctl start mongod
+  displayName: Start MongoDB
+
+- script: |
+    poetry run pytest tests -v --cov=wof --cov-report=xml --cov-report=html
   displayName: 'pytest'
 - task: PublishCodeCoverageResults@1
+  condition: always() 
   inputs:
     codeCoverageTool: Cobertura
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
