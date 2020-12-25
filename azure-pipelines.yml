@@ -26,6 +26,7 @@ steps:
     poetry run pytest tests -v --cov=wof --cov-report=xml --cov-report=html
   displayName: 'pytest'
 - task: PublishCodeCoverageResults@1
+  condition: always() 
   inputs:
     codeCoverageTool: Cobertura
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
