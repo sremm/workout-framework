@@ -34,7 +34,6 @@ def test_app():
 def test_happy_path_add_session_add_sets_get_len(test_app):
     with test_app as client:  # this runs startup event
         # add an empty session
-        workout_session_id = "abc123"
         set_data_1: Dict = {
             "exercise": "name",
             "reps": 1,
@@ -43,11 +42,12 @@ def test_happy_path_add_session_add_sets_get_len(test_app):
             "unit": "kg",
         }
         response = client.put(
-            f"/workout_sessions/{workout_session_id}",
+            "/workout_sessions",
             json=[set_data_1],
         )
         assert response.status_code == 200
-        assert response.json() == {"workout_session_id": workout_session_id}
+        assert len(response.json()["workout_session_ids"]) == 1
+        workout_session_id = response.json()["workout_session_ids"][0]
 
         set_data_2: Dict = {
             "exercise": "name",

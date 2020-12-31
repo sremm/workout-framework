@@ -28,7 +28,7 @@ def startup():
     uow["uow"] = unit_of_work.MongoUnitOfWork(session_factory=session_factory)
 
 
-@app.put("/workout_sessions/", tags=["workout_sessions"])
+@app.put("/workout_sessions", tags=["workout_sessions"])
 async def add_workout_session(workout_sets: List[WorkoutSet]):
     session_ids = services.add_workout_sessions(
         [WorkoutSession(sets=workout_sets)], uow["uow"]
