@@ -3,7 +3,7 @@ from typing import List
 from wof.adapters.mongo_db import MongoSession
 
 from wof.adapters.csv import CSVSession
-from wof.domain.model import WorkoutSession
+from wof.domain.model import WorkoutSession, WorkoutSet
 
 
 class BaseWorkoutSessionRepository(ABC):
@@ -14,6 +14,9 @@ class BaseWorkoutSessionRepository(ABC):
         raise NotImplementedError
 
     def list(self) -> List[WorkoutSession]:
+        raise NotImplementedError
+
+    def update(self, session_id: str, new_sets: List[WorkoutSet]) -> List:
         raise NotImplementedError
 
 
@@ -43,3 +46,6 @@ class MongoDBWorkoutSessionRepository(BaseWorkoutSessionRepository):
 
     def list(self) -> List[WorkoutSession]:
         return self.db_session.list()
+
+    def update(self, session_id: str, new_sets: List[WorkoutSet]) -> List:
+        return self.db_session.update(session_id, new_sets)

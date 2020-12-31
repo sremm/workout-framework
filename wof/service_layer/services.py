@@ -27,8 +27,7 @@ def add_sets_to_workout_session(
     with uow:
         workout_sessions = uow.repo.get([session_id])
         if len(workout_sessions) == 1:
-            workout_session = workout_sessions[0]
-            workout_session.add_sets(sets)
+            uow.repo.update(session_id, sets)
             uow.commit()
         elif len(workout_sessions) == 0:
             raise InvalidSessionId(f"Found no workout sessions with {session_id=}")
