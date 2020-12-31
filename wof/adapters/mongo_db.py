@@ -6,7 +6,7 @@ from bson.objectid import ObjectId
 from pydantic import BaseSettings
 from config import MongoSettings
 from pymongo import MongoClient
-from wof.domain.model import WorkoutSession
+from wof.domain.model import WorkoutSession, WorkoutSet
 
 ### Later check out https://github.com/art049/odmantic MongoDB ODM on top of pydantic
 
@@ -41,6 +41,10 @@ class MongoSession:
             added_ids.append(session_dict["_id"])
         self.committed = False
         return added_ids
+
+    def update(self, session_id: str, new_sets: List[WorkoutSet]):
+
+        return []
 
     def get(self, ids: List[str]) -> List[WorkoutSession]:
         result = []
