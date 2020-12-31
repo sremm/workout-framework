@@ -32,7 +32,9 @@ def mongo_session_factory_instance():
 
 
 class TestMongoUoW:
-    def test_uow_can_add_workout_sessions(self, mongo_session_factory_instance):
+    def test_uow_can_add_and_update_workout_sessions(
+        self, mongo_session_factory_instance
+    ):
         uow = MongoUnitOfWork(mongo_session_factory_instance)
         with uow:
             workout_sessions = [model.WorkoutSession(sets=[model.WorkoutSet()])]
@@ -41,8 +43,15 @@ class TestMongoUoW:
             )  # since mongodb truncates to milliseconds from microseconds
             added_session_ids = uow.repo.add(workout_sessions)
             uow.commit()
-        fetched_session = uow.repo.get(added_session_ids)
-        assert fetched_session == workout_sessions
+        fetched_sessions = uow.repo.get(added_session_ids)
+        assert fetched_sessions == workout_sessions
+        with uow:
+            new_sets = [model.WorkoutSet()]
+            workout_session = fetched_sessions[0]
+            workout_session.add_sets(new_sets)
+            uow.commit()
+        fetched_session = uow.repo.get(added_session_ids)[0]
+        assert len(fetched_session) == 2
 
     def test_rolls_back_uncommited_work_by_default(
         self, mongo_session_factory_instance
