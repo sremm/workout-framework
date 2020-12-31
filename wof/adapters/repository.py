@@ -7,7 +7,7 @@ from wof.domain.model import WorkoutSession
 
 
 class BaseWorkoutSessionRepository(ABC):
-    def add(self, sessions: List[WorkoutSession]) -> None:
+    def add(self, sessions: List[WorkoutSession]) -> List:
         raise NotImplementedError
 
     def get(self, ids: List[str]) -> List[WorkoutSession]:

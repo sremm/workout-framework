@@ -6,10 +6,11 @@ from wof.domain.model import WorkoutSession, WorkoutSet
 
 def add_workout_sessions(
     sessions: List[WorkoutSession], uow: AbstractUnitOfWork
-) -> None:
+) -> List:
     with uow:
-        uow.repo.add(sessions)
+        added_session_ids = uow.repo.add(sessions)
         uow.commit()
+    return added_session_ids
 
 
 class InvalidSessionId(Exception):
