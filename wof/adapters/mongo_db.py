@@ -4,17 +4,11 @@ from typing import List, Union, Dict
 
 from bson.objectid import ObjectId
 from pydantic import BaseSettings
+from config import MongoSettings
 from pymongo import MongoClient
 from wof.domain.model import WorkoutSession
 
 ### Later check out https://github.com/art049/odmantic MongoDB ODM on top of pydantic
-
-# could go to config later
-class MongoSettings(BaseSettings):
-    mongo_host: str = "localhost"
-    mongo_port: int = 27017
-    mongo_database: str = "test_db"
-    main_collection: str = "workout_sessions"
 
 
 def mongo_session_factory(mongo_settings: MongoSettings):

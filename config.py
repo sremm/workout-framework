@@ -2,6 +2,13 @@ from pathlib import Path
 from pydantic import BaseSettings
 
 
+class MongoSettings(BaseSettings):
+    mongo_host: str = "localhost"
+    mongo_port: int = 27017
+    mongo_database: str = "test_db"
+    main_collection: str = "workout_sessions"
+
+
 class ApiSettings(BaseSettings):
     api_host: str = "localhost"
     api_port: int = 5005
