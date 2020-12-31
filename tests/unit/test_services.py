@@ -18,6 +18,10 @@ class FakeRepository(repository.BaseWorkoutSessionRepository):
     def list(self) -> List[WorkoutSession]:
         return list(self._data)
 
+    def update(self, session_id, new_sets: List[WorkoutSet]):
+        session = self.get([session_id])[0]
+        session.add_sets(new_sets)
+
 
 class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
     def __init__(self) -> None:
