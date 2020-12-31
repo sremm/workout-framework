@@ -28,12 +28,12 @@ def startup():
     uow["uow"] = unit_of_work.MongoUnitOfWork(session_factory=session_factory)
 
 
-@app.put("/workout_sessions/{workout_session_id}", tags=["workout_sessions"])
-async def add_workout_sessions(workout_session_id: str, workout_sets: List[WorkoutSet]):
-    services.add_workout_sessions(
-        [WorkoutSession(id=workout_session_id, sets=workout_sets)], uow["uow"]
+@app.put("/workout_sessions/", tags=["workout_sessions"])
+async def add_workout_session(workout_sets: List[WorkoutSet]):
+    session_ids = services.add_workout_sessions(
+        [WorkoutSession(sets=workout_sets)], uow["uow"]
     )
-    return {"workout_session_id": workout_session_id}
+    return {"workout_session_ids": session_ids}
 
 
 @app.post("/workout_sessions/{workout_session_id}", tags=["workout_sessions"])
