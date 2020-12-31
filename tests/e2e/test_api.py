@@ -3,17 +3,32 @@ from typing import Dict
 
 import pytest
 from fastapi.testclient import TestClient
+from pymongo import MongoClient
+from wof.adapters.mongo_db import MongoSettings
 from wof.entrypoints.main import app
 
 
 @pytest.fixture(scope="module")
-def test_app(tmp_path_factory):
-    tmp_path = tmp_path_factory.mktemp("csv_dataset") / "test_data.csv"
+def test_app():
+    # set env vars for MongoSettings
+    evars = {
+        "MONGO_DATABASE": "test_db",
+        "MONGO_PORT": "27017",
+        "MONGO_HOST": "localhost",
+    }
+    for key, val in evars.items():
+        os.environ[key] = val
 
-    os.environ["CSV_DATASET_PATH"] = str(tmp_path)
     client = TestClient(app)
     yield client
-    os.environ.pop("CSV_DATASET_PATH")
+    # clear test database
+    mongo_settings = MongoSettings()
+    client = MongoClient(mongo_settings.mongo_host, mongo_settings.mongo_port)
+    collection = client[mongo_settings.mongo_database][mongo_settings.main_collection]
+    collection.drop()
+    # remove environment variables
+    for key, val in evars.items():
+        os.environ.pop(key)
 
 
 def test_happy_path_add_session_add_sets_get_len(test_app):
