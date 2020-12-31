@@ -2,7 +2,7 @@
 
 import logging
 from typing import List
-from wof.adapters.csv import csv_session_factory
+from wof.adapters.mongo_db import mongo_session_factory
 
 import config
 import uvicorn
@@ -23,9 +23,9 @@ uow = {}
 @app.on_event("startup")
 def startup():
     """ Initialise database """
-    db_settings = config.DatabaseSettings()
-    session_factory = csv_session_factory(db_settings.csv_dataset_path)
-    uow["uow"] = unit_of_work.CSVUnitOfWork(session_factory=session_factory)
+    db_settings = config.MongoSettings()
+    session_factory = mongo_session_factory(db_settings)
+    uow["uow"] = unit_of_work.MongoUnitOfWork(session_factory=session_factory)
 
 
 @app.put("/workout_sessions/{workout_session_id}", tags=["workout_sessions"])
