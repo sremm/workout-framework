@@ -54,6 +54,6 @@ def test_add_set_to_existing_session():
     ]
     services.add_sets_to_workout_session(sets, session_id, uow)
 
-    fetched_session = uow.repo.get([session_id])[0]
+    fetched_session = services.list_all_sessions(uow)[0]
     number_of_sets = len(fetched_session)
     assert number_of_sets == 2
