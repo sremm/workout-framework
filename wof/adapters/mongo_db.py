@@ -28,6 +28,7 @@ class MongoSession:
         )
         # start session and transaction
         self._uncommited: Dict[Dict] = {}
+        self._uncommited_updates: Dict = {}
         self._commited: bool = True
         self._db = self._client[self._mongo_settings.mongo_database]
         self._collection = self._db[self._mongo_settings.main_collection]
@@ -43,8 +44,10 @@ class MongoSession:
         return added_ids
 
     def update(self, session_id: str, new_sets: List[WorkoutSet]):
-
-        return []
+        session = self.get([session_id])[0]
+        session.add_sets(new_sets)
+        session_dict = session.dict()
+        self._uncommited_updates[session_id] = {"$set": {"sets": session_dict["sets"]}}
 
     def get(self, ids: List[str]) -> List[WorkoutSession]:
         result = []
@@ -68,6 +71,9 @@ class MongoSession:
         for session_dict in self._uncommited.values():
             session_dict["_id"] = ObjectId(session_dict["_id"])
             r = self._collection.insert_one(session_dict)
+        for session_id, update_dict in self._uncommited_updates.items():
+            query = {"_id": ObjectId(session_id)}
+            self._collection.update_one(query, update_dict)
         self.committed = True
 
     def close(self):
@@ -75,3 +81,4 @@ class MongoSession:
 
     def rollback(self):
         self._uncommited = {}
+        self._uncommited_updates = {}
