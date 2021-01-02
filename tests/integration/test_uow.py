@@ -47,8 +47,7 @@ class TestMongoUoW:
         assert fetched_sessions == workout_sessions
         with uow:
             new_sets = [model.WorkoutSet()]
-            workout_session = fetched_sessions[0]
-            workout_session.add_sets(new_sets)
+            uow.repo.update(added_session_ids[0], new_sets)
             uow.commit()
         fetched_session = uow.repo.get(added_session_ids)[0]
         assert len(fetched_session) == 2
