@@ -53,6 +53,7 @@ class TestMongoUoW:
     def test_concurrent_updates_to_version_are_not_allowed(
         self, mongo_session_factory_instance
     ):
+        """ Note that the result only has new_sets_2 but no exception is raised """
         uow = MongoUnitOfWork(mongo_session_factory_instance)
         with uow:
             workout_sessions = [model.WorkoutSession(sets=[model.WorkoutSet()])]
