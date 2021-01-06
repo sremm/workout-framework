@@ -65,12 +65,15 @@ class WorkoutSession(BaseModel):
     stop_time: Union[None, datetime] = None
     heart_rate: Union[None, TimeSeries] = None
     # sections: BaseSection # Could have sections instead sets here
+    version: int = 1
 
     def add_sets(self, sets: List[WorkoutSet]) -> None:
         self.sets.extend(sets)
+        self.version += 1
 
     def update_heart_rate(self, data: TimeSeries) -> None:
         self.heart_rate = data
+        self.version += 1
 
     def __len__(self) -> int:
         return len(self.sets)
