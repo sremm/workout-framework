@@ -94,6 +94,9 @@ class WorkoutSession(BaseModel):
     def __eq__(self, other) -> bool:
         return super().__eq__(other)
 
+    def __hash__(self):
+        return hash((type(self), self.__dict__["id"]))
+
 
 # might not quite work to validate and reconstuct, don't know yet
 class BaseSection(BaseModel):

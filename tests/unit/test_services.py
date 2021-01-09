@@ -7,18 +7,19 @@ from wof.service_layer import services, unit_of_work
 
 class FakeRepository(repository.BaseWorkoutSessionRepository):
     def __init__(self) -> None:
+        super().__init__()
         self._data: List[WorkoutSession] = []
 
-    def add(self, sessions: List[WorkoutSession]) -> None:
+    def _add(self, sessions: List[WorkoutSession]) -> None:
         return self._data.extend(sessions)
 
-    def get(self, ids: List[str]) -> List[WorkoutSession]:
+    def _get(self, ids: List[str]) -> List[WorkoutSession]:
         return [x for x in self._data if x.id in ids]
 
     def list(self) -> List[WorkoutSession]:
         return list(self._data)
 
-    def update(self, session_id, new_sets: List[WorkoutSet]) -> WorkoutSession:
+    def _update(self, session_id, new_sets: List[WorkoutSet]) -> WorkoutSession:
         session = self.get([session_id])[0]
         session.add_sets(new_sets)
         return session
