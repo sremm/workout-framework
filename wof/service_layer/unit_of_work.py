@@ -21,8 +21,17 @@ class AbstractUnitOfWork(abc.ABC):
     def __enter__(self):
         raise NotImplementedError
 
-    @abc.abstractmethod
     def commit(self):
+        self._commit()
+        self.publish_events()
+
+    def publish_events(self):
+        # for all sessions seen
+        # publish raised events
+        pass
+
+    @abc.abstractmethod
+    def _commit(self):
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -44,7 +53,7 @@ class MongoUnitOfWork(AbstractUnitOfWork):
     def __exit__(self, *args):
         super().__exit__()
 
-    def commit(self):
+    def _commit(self):
         self.db_session.commit()
 
     def rollback(self):
@@ -68,7 +77,7 @@ class CSVUnitOfWork(AbstractUnitOfWork):
     def __exit__(self, *args):
         super().__exit__()
 
-    def commit(self):
+    def _commit(self):
         self.db_session.commit()
 
     def rollback(self):

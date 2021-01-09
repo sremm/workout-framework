@@ -32,7 +32,7 @@ class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
     def __enter__(self):
         pass
 
-    def commit(self):
+    def _commit(self):
         self.committed = True
 
     def rollback(self):
