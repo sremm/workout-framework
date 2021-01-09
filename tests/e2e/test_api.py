@@ -76,5 +76,6 @@ def test_happy_path_add_session_add_sets_get_len(test_app):
                 "id": workout_session_id,
                 "heart_rate": None,
                 "version": 2,
+                "events": [],
             }
         ]
