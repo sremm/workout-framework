@@ -40,13 +40,14 @@ class MongoSession:
         self.committed = False
         return added_ids
 
-    def update(self, session_id: str, new_sets: List[WorkoutSet]):
+    def update(self, session_id: str, new_sets: List[WorkoutSet]) -> WorkoutSession:
         session = self.get([session_id])[0]
         session.add_sets(new_sets)
         session_dict = session.dict()
         self._uncommited_updates[session_id] = {
             "$set": {"sets": session_dict["sets"], "version": session_dict["version"]}
         }
+        return session
 
     def get(self, ids: List[str]) -> List[WorkoutSession]:
         result = []

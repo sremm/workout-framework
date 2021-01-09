@@ -16,7 +16,7 @@ class BaseWorkoutSessionRepository(ABC):
     def list(self) -> List[WorkoutSession]:
         raise NotImplementedError
 
-    def update(self, session_id: str, new_sets: List[WorkoutSet]) -> List:
+    def update(self, session_id: str, new_sets: List[WorkoutSet]) -> WorkoutSession:
         raise NotImplementedError
 
 
@@ -47,5 +47,5 @@ class MongoDBWorkoutSessionRepository(BaseWorkoutSessionRepository):
     def list(self) -> List[WorkoutSession]:
         return self.db_session.list()
 
-    def update(self, session_id: str, new_sets: List[WorkoutSet]) -> List:
+    def update(self, session_id: str, new_sets: List[WorkoutSet]) -> WorkoutSession:
         return self.db_session.update(session_id, new_sets)
