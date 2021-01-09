@@ -1,7 +1,6 @@
 from typing import List
 
 from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.service_layer import messagebus
 from wof.service_layer.unit_of_work import AbstractUnitOfWork
 
 
@@ -28,9 +27,8 @@ def add_sets_to_workout_session(
     with uow:
         workout_sessions = uow.repo.get([session_id])
         if len(workout_sessions) == 1:
-            workout_session = uow.repo.update(session_id, sets)
+            uow.repo.update(session_id, sets)
             uow.commit()
-            messagebus.handle_many(workout_session.events)
 
         elif len(workout_sessions) == 0:
             raise InvalidSessionId(f"Found no workout sessions with {session_id=}")
