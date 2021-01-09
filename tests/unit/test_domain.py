@@ -39,5 +39,5 @@ def test_event_raised_when_adding_many_sets_to_a_workout_session():
     session.add_sets(sets)
     assert len(session.events) == 1, "Events empty but should have 1 etry"
     assert session.events[-1] == events.ManySetsAddedToWorkoutSession(
-        workout_session_id=session.id, number_of_sets_added=10
+        id=session.id, number_of_sets_added=10
     )

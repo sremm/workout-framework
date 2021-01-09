@@ -11,6 +11,7 @@ from functools import total_ordering
 
 from pydantic import BaseModel, Field
 
+from wof.domain import events
 from wof.domain.events import Event
 
 
@@ -68,11 +69,17 @@ class WorkoutSession(BaseModel):
     heart_rate: Union[None, TimeSeries] = None
     # sections: BaseSection # Could have sections instead sets here
     version: int = 1
-    events: List[Event] = []
+    events: List[Event] = Field(default_factory=list)
 
     def add_sets(self, sets: List[WorkoutSet]) -> None:
         self.sets.extend(sets)
         self.version += 1
+        if len(sets) > 5:
+            self.events.append(
+                events.ManySetsAddedToWorkoutSession(
+                    id=self.id, number_of_sets_added=len(sets)
+                )
+            )
 
     def update_heart_rate(self, data: TimeSeries) -> None:
         self.heart_rate = data

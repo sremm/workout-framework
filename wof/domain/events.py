@@ -6,5 +6,9 @@ class Event(BaseModel):
 
 
 class ManySetsAddedToWorkoutSession(Event):
-    workout_session_id: str
+    """
+    id of the workout session
+    """
+
+    id: str
     number_of_sets_added: int
