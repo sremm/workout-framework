@@ -1,3 +1,4 @@
+import copy
 from typing import List
 
 from wof.adapters import repository
@@ -50,16 +51,30 @@ def test_add_workout_sessions():
 
 def test_add_set_to_existing_session():
     uow = FakeUnitOfWork()
-    session_id = "123"
-    sessions = [WorkoutSession(id=session_id)]
-    services.add_workout_sessions(sessions, uow)
+    session = WorkoutSession()
+    services.add_workout_sessions([session], uow)
 
     sets = [
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=1),
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=2),
     ]
-    services.add_sets_to_workout_session(sets, session_id, uow)
+    services.add_sets_to_workout_session(sets, session.id, uow)
 
     fetched_session = services.list_all_sessions(uow)[0]
     number_of_sets = len(fetched_session)
     assert number_of_sets == 2
+
+
+def test_event_is_raised_and_published():
+    uow = FakeUnitOfWork()
+    session = WorkoutSession()
+    services.add_workout_sessions([session], uow)
+
+    sets = [WorkoutSet() for _ in range(10)]
+    with uow:
+        uow.repo.update(session.id, sets)
+        events_raised = copy.copy(session.events)
+        uow.commit()
+    events_after_commit = session.events
+    assert len(events_raised) == 1
+    assert len(events_after_commit) == 0
