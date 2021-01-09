@@ -1,6 +1,7 @@
 import abc
 from typing import Callable
 from wof.adapters.mongo_db import MongoSession
+from wof.service_layer import messagebus
 
 from config import DatabaseSettings
 from wof.adapters.repository import (
@@ -26,9 +27,10 @@ class AbstractUnitOfWork(abc.ABC):
         self.publish_events()
 
     def publish_events(self):
-        # for all sessions seen
-        # publish raised events
-        pass
+        for session in self.repo.seen:
+            while session.events:
+                event = session.events.pop(0)
+                messagebus.handle(event)
 
     @abc.abstractmethod
     def _commit(self):
