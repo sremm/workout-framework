@@ -33,7 +33,6 @@ def test_app():
 
 def test_happy_path_add_session_add_sets_get_len(test_app):
     with test_app as client:  # this runs startup event
-        # add an empty session
         set_data_1: Dict = {
             "exercise": "name",
             "reps": 1,
