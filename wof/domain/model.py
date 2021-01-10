@@ -98,6 +98,20 @@ class WorkoutSession(BaseModel):
         return hash((type(self), self.__dict__["id"]))
 
 
+class TimeSeriesStats(BaseModel):
+    mean: float
+    min: float
+    max: float
+    std: float
+
+
+class WorkoutSessionsSummary(BaseModel):
+    session_ids: List[str]
+    total_reps: int
+    total_weight_lifted: float
+    heart_rate_stats: TimeSeriesStats
+
+
 # might not quite work to validate and reconstuct, don't know yet
 class BaseSection(BaseModel):
     """ A baseclass for Workout Section, subclass to create a specific section """
