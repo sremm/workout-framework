@@ -35,6 +35,10 @@ class WorkoutSet(BaseModel):
     set_number: int = 1  # used in Intensity app as "Set" # would be nice to instead have start time and length later but optional
     # order of sets could be inferred if we have start times, but for imported data we probably don't
 
+    @property
+    def has_subsets(self) -> bool:
+        return type(self.exercise) == type([])
+
     def __len__(self) -> int:
         if type(self.exercise) == list:
             return len(self.exercise)
