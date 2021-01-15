@@ -1,6 +1,6 @@
 from datetime import datetime
 from wof.domain.model import TimeSeries, WorkoutSession
-from wof.domain.model import WorkoutSet
+from wof.domain.model import WorkoutSet, WorkoutSetStats
 from wof.domain import events
 from typing import List
 
@@ -41,3 +41,53 @@ def test_event_raised_when_adding_many_sets_to_a_workout_session():
     assert session.events[-1] == events.ManySetsAddedToWorkoutSession(
         id=session.id, number_of_sets_added=10
     )
+
+
+class TestWorkoutSetStats:
+    def test_adding_two_stats(self):
+        result = WorkoutSetStats(
+            exercises=("one",),
+            total_reps=1,
+            total_weight=1,
+        ) + WorkoutSetStats(
+            exercises=("one",),
+            total_reps=1,
+            total_weight=1,
+        )
+        assert result == WorkoutSetStats(
+            exercises=("one",),
+            total_reps=2,
+            total_weight=2,
+        )
+
+    def test_adding_set_with_multiple_exercises(self):
+        result = WorkoutSetStats(
+            exercises=("one", "two"),
+            total_reps=2,
+            total_weight=2,
+        ) + WorkoutSetStats(
+            exercises=("three", "four"),
+            total_reps=2,
+            total_weight=2,
+        )
+        assert result == WorkoutSetStats(
+            exercises=("four", "one", "three", "two"),
+            total_reps=4,
+            total_weight=4,
+        )
+
+    def test_cannot_add_with_other_types(self):
+        raised = None
+        try:
+            WorkoutSetStats(
+                exercises=("one",),
+                total_reps=1,
+                total_weight=1,
+            ) + 2
+        except TypeError as e:
+            raised = e
+        assert raised is not None
+        assert (
+            "Addition of" in raised.args[0]
+            and "<class 'int'> not allowed" in raised.args[0]
+        )

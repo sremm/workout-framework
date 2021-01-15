@@ -4,7 +4,7 @@ Series x Sets x Reps of Excercies
 
 """
 from datetime import datetime
-from typing import List, Union
+from typing import List, Union, Tuple, Set
 from uuid import uuid4
 from bson.objectid import ObjectId
 from functools import total_ordering
@@ -102,6 +102,21 @@ class WorkoutSession(BaseModel):
         return hash((type(self), self.__dict__["id"]))
 
 
+class WorkoutSetStats(BaseModel):
+    total_reps: int
+    total_weight: int
+    exercises: Tuple[str, ...]
+
+    def __add__(self, other):
+        if type(other) != type(self):
+            raise TypeError(f"Addition of {type(self)} and {type(other)} not allowed")
+        return WorkoutSetStats(
+            total_reps=self.total_reps + other.total_reps,
+            total_weight=self.total_weight + other.total_weight,
+            exercises=tuple(sorted(set(self.exercises + other.exercises))),
+        )
+
+
 class TimeSeriesStats(BaseModel):
     mean: float
     min: float
@@ -110,9 +125,8 @@ class TimeSeriesStats(BaseModel):
 
 
 class WorkoutSessionsSummary(BaseModel):
-    session_ids: List[str]
-    total_reps: int
-    total_weight_lifted: float
+    session_ids: Tuple[str, ...]
+    workout_set_stats: WorkoutSetStats
     heart_rate_stats: TimeSeriesStats
 
 
