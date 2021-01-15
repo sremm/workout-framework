@@ -12,11 +12,12 @@ def test_add_sets_to_session():
     assert len(session) == 2
 
 
-def test_create_set_with_multiple_exercises():
-    a_set = WorkoutSet(
-        exercise=["first", "second"],
-    )
-    assert len(a_set) == 2
+class TestWorkoutSet:
+    def test_create_with_multiple_exercises(self):
+        a_set = WorkoutSet(
+            exercise=["first", "second"],
+        )
+        assert len(a_set) == 2
 
 
 def test_create_session_with_hr_data():
@@ -90,4 +91,18 @@ class TestWorkoutSetStats:
         assert (
             "Addition of" in raised.args[0]
             and "<class 'int'> not allowed" in raised.args[0]
+        )
+
+    def test_compute_from_workout_sets(self):
+        sets = [
+            WorkoutSet(exercise="one", reps=5, weight=10, set_number=x)
+            for x in range(1, 4)
+        ] + [
+            WorkoutSet(
+                excercise=["two", "three"], reps=[5, 5], weight=[10, 10], set_number=4
+            )
+        ]
+        result = WorkoutSetStats.calculate(sets)
+        assert result == WorkoutSetStats(
+            total_reps=25, total_weight_lifted=170.0, exercise=["one", "two", "three"]
         )

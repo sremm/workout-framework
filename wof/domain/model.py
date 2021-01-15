@@ -106,6 +106,11 @@ class WorkoutSetStats(BaseModel):
     total_reps: int
     total_weight: int
     exercises: Tuple[str, ...]
+    weight_unit: str = "kg"
+
+    @staticmethod
+    def calculate(sets: List[WorkoutSet]):
+        return WorkoutSetStats(total_reps=1, total_weight_lifted=1, exercise=("one",))
 
     def __add__(self, other):
         if type(other) != type(self):
