@@ -1,26 +1,35 @@
-from wof.domain import model
+from wof.domain.model import (
+    TimeSeries,
+    TimeSeriesStats,
+    WorkoutSession,
+    WorkoutSessionsSummary,
+    WorkoutSetStats,
+)
 from typing import List
+import numpy as np
 
 
-def compute_time_series_stats(data: List[model.TimeSeries]) -> model.TimeSeriesStats:
-
-    return model.TimeSeriesStats(mean=1, min=2, max=3, std=1.0)
+def compute_time_series_stats(data: List[TimeSeries]) -> TimeSeriesStats:
+    stats_mean = np.mean([TimeSeriesStats.compute(x).values for x in data], axis=0)
+    return TimeSeriesStats(
+        mean=stats_mean[0], min=stats_mean[1], max=stats_mean[2], std=stats_mean[3]
+    )
 
 
 def compute_merged_set_stats(
-    sessions: List[model.WorkoutSession],
-) -> model.WorkoutSetStats:
-    stats: List[model.WorkoutSetStats] = [
-        model.WorkoutSetStats.calculate(session.sets) for session in sessions
+    sessions: List[WorkoutSession],
+) -> WorkoutSetStats:
+    stats: List[WorkoutSetStats] = [
+        WorkoutSetStats.compute(session.sets) for session in sessions
     ]
-    result: model.WorkoutSetStats = sum(stats)
+    result: WorkoutSetStats = sum(stats, start=WorkoutSetStats.empty_stats())
     return result
 
 
 def compute_workout_sessions_summary(
-    sessions: List[model.WorkoutSession],
-) -> model.WorkoutSessionsSummary:
-    return model.WorkoutSessionsSummary(
+    sessions: List[WorkoutSession],
+) -> WorkoutSessionsSummary:
+    return WorkoutSessionsSummary(
         session_ids=[x.id for x in sessions],
         workout_set_stats=compute_merged_set_stats(sessions),
         heart_rate_stats=compute_time_series_stats(
