@@ -4,13 +4,13 @@ Series x Sets x Reps of Excercies
 
 """
 from datetime import datetime
-from typing import List, Union, Tuple, Set
-from uuid import uuid4
-from bson.objectid import ObjectId
 from functools import total_ordering
+from typing import List, Tuple, Union
+from uuid import uuid4
 
+import numpy as np
+from bson.objectid import ObjectId
 from pydantic import BaseModel, Field
-
 from wof.domain import events
 from wof.domain.events import Event
 
@@ -110,7 +110,28 @@ class WorkoutSetStats(BaseModel):
 
     @staticmethod
     def calculate(sets: List[WorkoutSet]):
-        return WorkoutSetStats(total_reps=1, total_weight_lifted=1, exercise=("one",))
+        def _calculate_stats(workout_set: WorkoutSet):
+            if workout_set.has_subsets:
+                return WorkoutSetStats(
+                    total_reps=np.sum(workout_set.reps),
+                    total_weight=np.sum(
+                        np.array(workout_set.weights) * np.array(workout_set.reps)
+                    ),
+                    exercises=tuple(sorted(set(workout_set.exercise))),
+                )
+            else:
+                return WorkoutSetStats(
+                    total_reps=workout_set.reps,
+                    total_weight=workout_set.weights * workout_set.reps,
+                    exercises=(workout_set.exercise,),
+                )
+
+        stats_list = [_calculate_stats(x) for x in sets]
+        return sum(stats_list, start=WorkoutSetStats._sum_start())
+
+    @staticmethod
+    def _sum_start():
+        return WorkoutSetStats(total_reps=0, total_weight=0, exercises=())
 
     def __add__(self, other):
         if type(other) != type(self):

@@ -95,14 +95,14 @@ class TestWorkoutSetStats:
 
     def test_compute_from_workout_sets(self):
         sets = [
-            WorkoutSet(exercise="one", reps=5, weight=10, set_number=x)
+            WorkoutSet(exercise="one", reps=5, weights=10, set_number=x)
             for x in range(1, 4)
         ] + [
             WorkoutSet(
-                excercise=["two", "three"], reps=[5, 5], weight=[10, 10], set_number=4
+                exercise=["two", "three"], reps=[5, 5], weights=[10, 10], set_number=4
             )
         ]
         result = WorkoutSetStats.calculate(sets)
         assert result == WorkoutSetStats(
-            total_reps=25, total_weight_lifted=170.0, exercise=["one", "two", "three"]
+            total_reps=25, total_weight=250, exercises=("one", "three", "two")
         )
