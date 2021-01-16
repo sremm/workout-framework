@@ -144,9 +144,7 @@ class WorkoutSetStats(BaseModel):
 
 
 class TimeSeriesStats(BaseModel):
-    """Stats are calculated per session
-    For stats that cover multiple sessions the values are averages taken over all session stats
-    """
+    """Stats are calculated per series"""
 
     mean: float
     min: float
@@ -160,6 +158,17 @@ class TimeSeriesStats(BaseModel):
             min=min(time_series.values),
             max=max(time_series.values),
             std=np.nanstd(time_series.values),
+        )
+
+    @property
+    def values(self) -> np.ndarray:
+        return np.array(
+            [
+                self.mean,
+                self.min,
+                self.max,
+                self.std,
+            ]
         )
 
 
