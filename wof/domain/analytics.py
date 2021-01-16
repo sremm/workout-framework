@@ -1,7 +1,8 @@
-from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
 from typing import List, Tuple
+
 import numpy as np
 from pydantic import BaseModel
+from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
 
 
 class WorkoutSetStats(BaseModel):
