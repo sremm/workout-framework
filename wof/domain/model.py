@@ -127,10 +127,10 @@ class WorkoutSetStats(BaseModel):
                 )
 
         stats_list = [_calculate_stats(x) for x in sets]
-        return sum(stats_list, start=WorkoutSetStats._sum_start())
+        return sum(stats_list, start=WorkoutSetStats.empty_stats())
 
     @staticmethod
-    def _sum_start():
+    def empty_stats():
         return WorkoutSetStats(total_reps=0, total_weight=0, exercises=())
 
     def __add__(self, other):
