@@ -1,5 +1,5 @@
 from datetime import datetime
-from wof.domain.model import TimeSeries, WorkoutSession
+from wof.domain.model import TimeSeries, TimeSeriesStats, WorkoutSession
 from wof.domain.model import WorkoutSet, WorkoutSetStats
 from wof.domain import events
 from typing import List
@@ -32,6 +32,17 @@ def test_create_session_with_hr_data():
     session.update_heart_rate(hr_data)
 
     assert session.heart_rate == hr_data
+
+
+class TestTimeSeriesStats:
+    def test_compute(self):
+        time: List[datetime] = [
+            datetime(2000, 1, 1, 15, 0, 0, 0),
+            datetime(2000, 1, 1, 15, 0, 1, 0),
+        ]
+        data = TimeSeries(values=[1, 2], time=time, unit="bpm")
+        results = TimeSeriesStats.compute(data)
+        assert results == TimeSeriesStats(mean=1.5, min=1.0, max=2.0, std=0.5)
 
 
 def test_event_raised_when_adding_many_sets_to_a_workout_session():
@@ -102,7 +113,7 @@ class TestWorkoutSetStats:
                 exercise=["two", "three"], reps=[5, 5], weights=[10, 10], set_number=4
             )
         ]
-        result = WorkoutSetStats.calculate(sets)
+        result = WorkoutSetStats.compute(sets)
         assert result == WorkoutSetStats(
             total_reps=25, total_weight=250, exercises=("one", "three", "two")
         )

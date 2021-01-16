@@ -109,8 +109,8 @@ class WorkoutSetStats(BaseModel):
     weight_unit: str = "kg"
 
     @staticmethod
-    def calculate(sets: List[WorkoutSet]):
-        def _calculate_stats(workout_set: WorkoutSet):
+    def compute(sets: List[WorkoutSet]):
+        def _compute_stats(workout_set: WorkoutSet):
             if workout_set.has_subsets:
                 return WorkoutSetStats(
                     total_reps=np.sum(workout_set.reps),
@@ -126,7 +126,7 @@ class WorkoutSetStats(BaseModel):
                     exercises=(workout_set.exercise,),
                 )
 
-        stats_list = [_calculate_stats(x) for x in sets]
+        stats_list = [_compute_stats(x) for x in sets]
         return sum(stats_list, start=WorkoutSetStats.empty_stats())
 
     @staticmethod
@@ -144,10 +144,23 @@ class WorkoutSetStats(BaseModel):
 
 
 class TimeSeriesStats(BaseModel):
+    """Stats are calculated per session
+    For stats that cover multiple sessions the values are averages taken over all session stats
+    """
+
     mean: float
     min: float
     max: float
     std: float
+
+    @staticmethod
+    def compute(time_series: TimeSeries):
+        return TimeSeriesStats(
+            mean=np.nanmean(time_series.values),
+            min=min(time_series.values),
+            max=max(time_series.values),
+            std=np.nanstd(time_series.values),
+        )
 
 
 class WorkoutSessionsSummary(BaseModel):
@@ -161,7 +174,7 @@ class BaseSection(BaseModel):
     """ A baseclass for Workout Section, subclass to create a specific section """
 
     start_time: datetime
-    end_time: datetime  # or length ? either way both can be calculated from the other
+    end_time: datetime  # or length ? either way both can be computed from the other
 
 
 class StrengthSection(BaseSection):
