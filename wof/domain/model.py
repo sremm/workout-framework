@@ -4,13 +4,12 @@ Series x Sets x Reps of Excercies
 
 """
 from datetime import datetime
+from functools import total_ordering
 from typing import List, Union
 from uuid import uuid4
+
 from bson.objectid import ObjectId
-from functools import total_ordering
-
 from pydantic import BaseModel, Field
-
 from wof.domain import events
 from wof.domain.events import Event
 
@@ -34,6 +33,10 @@ class WorkoutSet(BaseModel):
     unit: str = "kg"
     set_number: int = 1  # used in Intensity app as "Set" # would be nice to instead have start time and length later but optional
     # order of sets could be inferred if we have start times, but for imported data we probably don't
+
+    @property
+    def has_subsets(self) -> bool:
+        return type(self.exercise) == type([])
 
     def __len__(self) -> int:
         if type(self.exercise) == list:
@@ -117,7 +120,7 @@ class BaseSection(BaseModel):
     """ A baseclass for Workout Section, subclass to create a specific section """
 
     start_time: datetime
-    end_time: datetime  # or length ? either way both can be calculated from the other
+    end_time: datetime  # or length ? either way both can be computed from the other
 
 
 class StrengthSection(BaseSection):
