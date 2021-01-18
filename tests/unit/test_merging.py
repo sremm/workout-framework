@@ -13,20 +13,29 @@ def create_timeseries_entry() -> TimeSeries:
 
 
 class TestPolarIntensityMerge:
-    def test_merge_single_session_from_both(self):
+    def test_merge_two_polar_one_intensity(self):
         polar_imports = [
             WorkoutSession(
-                id="polar",
+                id="polar1",
                 start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
                 stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
                 heart_rate=create_timeseries_entry(),
-            )
+                origin=["polar"],
+            ),
+            WorkoutSession(
+                id="polar2",
+                start_time=datetime(2020, 1, 2, 17, 0, 0, 0),
+                stop_time=datetime(2020, 1, 2, 18, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
+            ),
         ]  # has no sets
         intensity_imports = [
             WorkoutSession(
                 id="intensity",
                 sets=[WorkoutSet(), WorkoutSet()],
                 start_time=datetime(2020, 1, 1),
+                origin=["intensity"],
             )
         ]  # has no heart rate or stop time
 
@@ -35,10 +44,18 @@ class TestPolarIntensityMerge:
         )
         assert result == [
             WorkoutSession(
-                id="something",
+                id="polar1",
                 sets=[WorkoutSet(), WorkoutSet()],
                 start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
                 stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
                 heart_rate=create_timeseries_entry(),
-            )
+                origin=["polar", "intensity"],
+            ),
+            WorkoutSession(
+                id="polar2",
+                start_time=datetime(2020, 1, 2, 17, 0, 0, 0),
+                stop_time=datetime(2020, 1, 2, 18, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
+            ),
         ]
