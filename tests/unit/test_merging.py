@@ -2,7 +2,7 @@ from datetime import datetime
 from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
 from wof.import_logic.data_merging import (
     merge_polar_and_instensity_imports,
-    merge_sessions,
+    add_sets_from_sessions,
 )
 
 
@@ -15,30 +15,34 @@ def create_timeseries_entry() -> TimeSeries:
     return TimeSeries(values=[1, 2, 3], time=time, unit="bpm")
 
 
-class TestMergeSessions:
-    def test_with_timeseries_and_sets(self):
-        base_session = WorkoutSession(
-            id="sess1",
-            start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
-            stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
-            heart_rate=create_timeseries_entry(),
-        )
 
-        sessions = [
-            WorkoutSession(
-                id="sess2",
-                sets=[WorkoutSet()],
-                start_time=datetime(2020, 1, 1),
-            ),
-        ]
-        result = merge_sessions(base_session, sessions_to_merge=sessions)
-        assert result == WorkoutSession(
-            id="sess1",
+def test_add_sets_from_sessions():
+    base_session = WorkoutSession(
+        id="sess1",
+        start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
+        stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
+        heart_rate=create_timeseries_entry(),
+        origin=["a"],
+    )
+
+    sessions = [
+        WorkoutSession(
+            id="sess2",
             sets=[WorkoutSet()],
-            start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
-            stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
-            heart_rate=create_timeseries_entry(),
-        )
+            start_time=datetime(2020, 1, 1),
+            origin=["b"],
+        ),
+    ]
+    result = add_sets_from_sessions(base_session, sessions_with_sets=sessions)
+    assert result == WorkoutSession(
+        id="sess1",
+        sets=[WorkoutSet()],
+        start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
+        stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
+        heart_rate=create_timeseries_entry(),
+        version=2,
+        origin=["a", "b"],
+    )
 
 
 class TestPolarIntensityMerge:
