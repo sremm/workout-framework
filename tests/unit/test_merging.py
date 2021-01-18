@@ -15,7 +15,6 @@ def create_timeseries_entry() -> TimeSeries:
     return TimeSeries(values=[1, 2, 3], time=time, unit="bpm")
 
 
-
 def test_add_sets_from_sessions():
     base_session = WorkoutSession(
         id="sess1",
@@ -83,6 +82,7 @@ class TestPolarIntensityMerge:
                 stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
                 heart_rate=create_timeseries_entry(),
                 origin=["polar", "intensity"],
+                version=2,
             ),
             WorkoutSession(
                 id="polar2",
