@@ -75,8 +75,10 @@ class WorkoutSession(BaseModel):
     events: List[Event] = Field(default_factory=list)
     origin: List[str] = Field(default_factory=list)  # how session was created
 
-    def add_sets(self, sets: List[WorkoutSet]) -> None:
+    def add_sets(self, sets: List[WorkoutSet], origin: Union[None,List] =None) -> None:
         self.sets.extend(sets)
+        if origin is not None:
+            self.origin.extend(origin)
         self.version += 1
         if len(sets) > 5:
             self.events.append(
