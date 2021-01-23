@@ -45,7 +45,7 @@ def test_add_sets_from_sessions():
 
 
 class TestPolarIntensityMerge:
-    def test_merge_two_polar_one_intensity(self):
+    def test_merge_two_polar_two_intensity(self):
         polar_imports = [
             WorkoutSession(
                 id="polar1",
@@ -68,7 +68,13 @@ class TestPolarIntensityMerge:
                 sets=[WorkoutSet(), WorkoutSet()],
                 start_time=datetime(2020, 1, 1),
                 origin=["intensity"],
-            )
+            ),
+            WorkoutSession(
+                id="intensity",
+                sets=[WorkoutSet()],
+                start_time=datetime(2020, 1, 3),
+                origin=["intensity"],
+            ),
         ]  # has no heart rate or stop time
 
         result = merge_polar_and_instensity_imports(
@@ -91,4 +97,17 @@ class TestPolarIntensityMerge:
                 heart_rate=create_timeseries_entry(),
                 origin=["polar"],
             ),
+            WorkoutSession(
+                id="intensity",
+                sets=[WorkoutSet()],
+                start_time=datetime(2020, 1, 3),
+                origin=["intensity"],
+            ),
         ]
+
+    def test_multiple_sessions_on_one_day(self):
+        # if there are multiple sessions, then we should match to strenght training session
+        # if there are multple strenght sessions then we don't know really, what should the result be?
+        #       are there even such cases, we should at least not be able to assign intensity reps sets to all sessions on one day
+
+        assert 0

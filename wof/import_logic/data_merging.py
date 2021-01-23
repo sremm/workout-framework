@@ -29,28 +29,43 @@ def merge_polar_and_instensity_imports(
 
     def _match_datetime_days(
         times_1: List[datetime], times_2: List[datetime]
-    ) -> List[List[datetime]]:
-        result = []
-        matched = []
+    ) -> Tuple[List[List[datetime]], List[datetime], List[datetime]]:
+        matched_start_times = []
+        umatched_times_1 = []
+        umatched_times_2 = []
+        matched_times_2 = []
+        # find matches for time_1
         for time_1 in times_1:
             found_match = False
+            # see if any time_2 matches time_1
             for time_2 in times_2:
-                if time_2 not in matched and are_on_same_day(time_1, time_2):
+                if time_2 not in matched_times_2 and are_on_same_day(time_1, time_2):
                     found_match = True
-                    result.append([time_1, time_2])
-                    matched.append(time_2)
+                    matched_start_times.append([time_1, time_2])
+                    matched_times_2.append(time_2)
             if not found_match:
-                result.append([time_1])
-        return result
+                umatched_times_1.append(time_1)
+        # add all times 2 without match to result list
+        for time_2 in times_2:
+            if time_2 not in matched_times_2:
+                umatched_times_2.append(time_2)
+
+        return matched_start_times, umatched_times_1, umatched_times_2
 
     polar: Dict = _get_start_time_to_session_mapping(polar_sessions)
     intensity: Dict = _get_start_time_to_session_mapping(intensity_sessions)
-    matched_start_times = _match_datetime_days(
-        list(polar.keys()), list(intensity.keys())
-    )
+    (
+        matched_start_times,
+        unmatched_polar_times,
+        unmatched_intensity_times,
+    ) = _match_datetime_days(list(polar.keys()), list(intensity.keys()))
     results = []
     for matched_times in matched_start_times:
         base_session = polar[matched_times.pop(0)]
         sessions = [intensity[x] for x in matched_times]
         results.append(add_sets_from_sessions(base_session, sessions))
+    for time in unmatched_polar_times:
+        results.append(polar[time])
+    for time in unmatched_intensity_times:
+        results.append(intensity[time])
     return results
