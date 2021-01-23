@@ -5,7 +5,7 @@ Series x Sets x Reps of Excercies
 """
 from datetime import datetime
 from functools import total_ordering
-from typing import List, Union
+from typing import List, Union, Optional
 from uuid import uuid4
 
 from bson.objectid import ObjectId
@@ -68,14 +68,14 @@ class WorkoutSession(BaseModel):
     sets: List[WorkoutSet] = Field(default_factory=list)
     id: str = Field(default_factory=object_id_as_str)
     start_time: datetime = Field(default_factory=datetime.now)
-    stop_time: Union[None, datetime] = None
-    heart_rate: Union[None, TimeSeries] = None
+    stop_time: Optional[datetime] = None
+    heart_rate: Optional[TimeSeries] = None
     # sections: BaseSection # Could have sections instead sets here
     version: int = 1
     events: List[Event] = Field(default_factory=list)
     origin: List[str] = Field(default_factory=list)  # how session was created
 
-    def add_sets(self, sets: List[WorkoutSet], origin: Union[None,List] =None) -> None:
+    def add_sets(self, sets: List[WorkoutSet], origin: Optional[List] = None) -> None:
         self.sets.extend(sets)
         if origin is not None:
             self.origin.extend(origin)

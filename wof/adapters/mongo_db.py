@@ -1,6 +1,6 @@
 """ Stuff for handling MongoDB specifics"""
 
-from typing import List, Union, Dict
+from typing import List, Optional, Dict
 
 from bson.objectid import ObjectId
 from config import MongoSettings
@@ -16,7 +16,7 @@ def mongo_session_factory(mongo_settings: MongoSettings):
 
 
 class MongoSession:
-    def __init__(self, mongo_settings: Union[None, MongoSettings] = None) -> None:
+    def __init__(self, mongo_settings: Optional[ MongoSettings] = None) -> None:
         self._mongo_settings = (
             MongoSettings() if mongo_settings is None else mongo_settings
         )
