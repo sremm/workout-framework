@@ -105,9 +105,54 @@ class TestPolarIntensityMerge:
             ),
         ]
 
-    def test_multiple_sessions_on_one_day(self):
+    def test_multiple_polart_sessions_on_one_day(self):
         # if there are multiple sessions, then we should match to strenght training session
         # if there are multple strenght sessions then we don't know really, what should the result be?
         #       are there even such cases, we should at least not be able to assign intensity reps sets to all sessions on one day
 
-        assert 0
+        polar_imports = [
+            WorkoutSession(
+                id="polar1",
+                start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
+                stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
+            ),
+            WorkoutSession(
+                id="polar2",
+                start_time=datetime(2020, 1, 1, 20, 0, 0, 0),
+                stop_time=datetime(2020, 1, 1, 21, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
+            ),
+        ]  # has no sets
+        intensity_imports = [
+            WorkoutSession(
+                id="intensity",
+                sets=[WorkoutSet(), WorkoutSet()],
+                start_time=datetime(2020, 1, 1),
+                origin=["intensity"],
+            ),
+        ]  # has no heart rate or stop time
+
+        result = merge_polar_and_instensity_imports(
+            polar_sessions=polar_imports, intensity_sessions=intensity_imports
+        )
+        assert result == [
+            WorkoutSession(
+                id="polar1",
+                sets=[WorkoutSet(), WorkoutSet()],
+                start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
+                stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar", "intensity"],
+                version=2,
+            ),
+            WorkoutSession(
+                id="polar2",
+                start_time=datetime(2020, 1, 1, 20, 0, 0, 0),
+                stop_time=datetime(2020, 1, 1, 21, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
+            ),
+        ]
