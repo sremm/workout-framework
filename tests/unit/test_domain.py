@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import List
 
-from wof.domain import events
 from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
 
 

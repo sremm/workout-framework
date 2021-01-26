@@ -10,8 +10,6 @@ from uuid import uuid4
 
 from bson.objectid import ObjectId
 from pydantic import BaseModel, Field
-from wof.domain import events
-from wof.domain.events import Event
 
 
 class Exercise(BaseModel):
@@ -72,7 +70,7 @@ class WorkoutSession(BaseModel):
     heart_rate: Optional[TimeSeries] = None
     # sections: BaseSection # Could have sections instead sets here
     version: int = 1
-    events: List[Event] = Field(default_factory=list)
+    events: List = Field(default_factory=list)
     origin: List[str] = Field(default_factory=list)  # how session was created
 
     def add_sets(self, sets: List[WorkoutSet], origin: Optional[List] = None) -> None:

@@ -63,18 +63,3 @@ def test_add_set_to_existing_session():
     fetched_session = services.list_all_sessions(uow)[0]
     number_of_sets = len(fetched_session)
     assert number_of_sets == 2
-
-
-def test_event_is_raised_and_published():
-    uow = FakeUnitOfWork()
-    session = WorkoutSession()
-    services.add_workout_sessions([session], uow)
-
-    sets = [WorkoutSet() for _ in range(10)]
-    with uow:
-        uow.repo.update(session.id, sets)
-        events_raised = copy.copy(session.events)
-        uow.commit()
-    events_after_commit = session.events
-    assert len(events_raised) == 1
-    assert len(events_after_commit) == 0
