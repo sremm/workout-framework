@@ -80,12 +80,6 @@ class WorkoutSession(BaseModel):
         if origin is not None:
             self.origin.extend(origin)
         self.version += 1
-        if len(sets) > 5:
-            self.events.append(
-                events.ManySetsAddedToWorkoutSession(
-                    id=self.id, number_of_sets_added=len(sets)
-                )
-            )
 
     def update_heart_rate(self, data: TimeSeries) -> None:
         self.heart_rate = data
