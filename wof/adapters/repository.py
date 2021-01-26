@@ -1,8 +1,7 @@
 from abc import ABC
 from typing import List, Set
-from wof.adapters.mongo_db import MongoSession
 
-from wof.adapters.csv import CSVSession
+from wof.adapters.mongo_db import MongoSession
 from wof.domain.model import WorkoutSession, WorkoutSet
 
 
@@ -38,21 +37,6 @@ class BaseWorkoutSessionRepository(ABC):
 
     def _update(self, session_id: str, new_sets: List[WorkoutSet]) -> WorkoutSession:
         raise NotImplementedError
-
-
-class CSVWorkoutSessionRepository(BaseWorkoutSessionRepository):
-    def __init__(self, db_session: CSVSession) -> None:
-        super().__init__()
-        self.db_session = db_session
-
-    def _add(self, sessions: List[WorkoutSession]) -> None:
-        self.db_session.add(sessions)
-
-    def _get(self, ids: List[str]) -> List[WorkoutSession]:
-        return self.db_session.get(ids)
-
-    def list(self) -> List[WorkoutSession]:
-        return self.db_session.list()
 
 
 class MongoDBWorkoutSessionRepository(BaseWorkoutSessionRepository):
