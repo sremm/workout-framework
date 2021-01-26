@@ -32,12 +32,3 @@ class TestWorkoutSession:
         sets = [WorkoutSet(), WorkoutSet()]
         session.add_sets(sets)
         assert len(session) == 2
-
-    def test_event_raised_when_adding_many_sets(self):
-        session = WorkoutSession()
-        sets = [WorkoutSet() for _ in range(10)]
-        session.add_sets(sets)
-        assert len(session.events) == 1, "Events empty but should have 1 etry"
-        assert session.events[-1] == events.ManySetsAddedToWorkoutSession(
-            id=session.id, number_of_sets_added=10
-        )
