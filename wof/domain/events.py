@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 
 import datetime
 from pydantic import BaseModel
-from wof.domain.model import WorkoutSet
+from wof.domain.model import WorkoutSession, WorkoutSet
 
 
 class Event(BaseModel):
@@ -10,10 +10,15 @@ class Event(BaseModel):
 
 
 class SessionStarted(Event):
-    pass
+    sets: Optional[List[WorkoutSet]] = None
+
+
+class SessionsToAdd(Event):
+    sessions: List[WorkoutSession]
 
 
 class SetsCompleted(Event):
+    session_id: str
     sets: List[WorkoutSet]
 
 

@@ -1,14 +1,22 @@
 from typing import List
 
+from wof.domain import events
 from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.service_layer.unit_of_work import AbstractUnitOfWork
 
 
-def add_workout_sessions(
-    sessions: List[WorkoutSession], uow: AbstractUnitOfWork
-) -> List:
+def import_sessions(event: events.ImportRequested, uow: AbstractUnitOfWork):
+    def _convert(event: events.ImportRequested) -> events.SessionsToAdd:
+        return events.SessionsToAdd(sessions=[])
+
+    # convert to sessions
+    sessions_to_add = _convert(event)
+    add_workout_sessions(sessions_to_add, uow)
+
+
+def add_workout_sessions(event: events.SessionsToAdd, uow: AbstractUnitOfWork) -> List:
     with uow:
-        added_session_ids = uow.repo.add(sessions)
+        added_session_ids = uow.repo.add(event.sessions)
         uow.commit()
     return added_session_ids
 
@@ -21,23 +29,33 @@ class DuplicateSessions(Exception):
     pass
 
 
-def add_sets_to_workout_session(
-    sets: List[WorkoutSet], session_id: str, uow: AbstractUnitOfWork
-):
+def add_sets_to_workout_session(event: events.SetsCompleted, uow: AbstractUnitOfWork):
     with uow:
-        workout_sessions = uow.repo.get([session_id])
+        workout_sessions = uow.repo.get([event.session_id])
         if len(workout_sessions) == 1:
-            uow.repo.update(session_id, sets)
+            uow.repo.update(event.session_id, event.sets)
             uow.commit()
 
         elif len(workout_sessions) == 0:
-            raise InvalidSessionId(f"Found no workout sessions with {session_id=}")
+            raise InvalidSessionId(
+                f"Found no workout sessions with {event.session_id=}"
+            )
         else:
             raise DuplicateSessions(
-                f"Found {len(workout_sessions)} sessions with {session_id=}, but should only get one"
+                f"Found {len(workout_sessions)} sessions with {event.session_id=}, but should only get one"
             )
 
-    return sets
+    return event.sets
+
+
+def get_sessions(
+    event: events.SessionsRequested, uow: AbstractUnitOfWork
+) -> List[WorkoutSession]:
+    if event.date_range is None:
+        return list_all_sessions(uow)
+    else:
+        # return sessions within event.date_range
+        raise NotImplementedError
 
 
 def list_all_sessions(uow: AbstractUnitOfWork) -> List[WorkoutSession]:
