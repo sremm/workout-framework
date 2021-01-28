@@ -1,9 +1,9 @@
-from wof.service_layer.unit_of_work import AbstractUnitOfWork
-from wof.domain import events
-from wof.service_layer import handlers
 from typing import Callable, Dict, List
 
-Handler = Callable[events.Event, AbstractUnitOfWork]
+from wof.domain import events
+from wof.service_layer import handlers, unit_of_work
+
+Handler = Callable[events.Event, unit_of_work.AbstractUnitOfWork]
 
 HANDLERS: Dict[events.Event, List[Handler]] = {
     # events.SessionStarted: handlers...
@@ -13,7 +13,7 @@ HANDLERS: Dict[events.Event, List[Handler]] = {
 }
 
 
-def handle(event: events.Event, uow: AbstractUnitOfWork):
+def handle(event: events.Event, uow: unit_of_work.AbstractUnitOfWork):
     queue = [event]
     while queue:
         event = queue.pop(0)

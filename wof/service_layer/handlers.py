@@ -2,10 +2,12 @@ from typing import List
 
 from wof.domain import events
 from wof.domain.model import WorkoutSession
-from wof.service_layer.unit_of_work import AbstractUnitOfWork
+from wof.service_layer import unit_of_work
 
 
-def import_sessions(event: events.ImportRequested, uow: AbstractUnitOfWork):
+def import_sessions(
+    event: events.ImportRequested, uow: unit_of_work.AbstractUnitOfWork
+):
     def _convert(event: events.ImportRequested) -> events.SessionsToAdd:
         return events.SessionsToAdd(sessions=[])
 
@@ -14,7 +16,9 @@ def import_sessions(event: events.ImportRequested, uow: AbstractUnitOfWork):
     add_workout_sessions(sessions_to_add, uow)
 
 
-def add_workout_sessions(event: events.SessionsToAdd, uow: AbstractUnitOfWork) -> List:
+def add_workout_sessions(
+    event: events.SessionsToAdd, uow: unit_of_work.AbstractUnitOfWork
+) -> List:
     with uow:
         added_session_ids = uow.repo.add(event.sessions)
         uow.commit()
@@ -29,7 +33,9 @@ class DuplicateSessions(Exception):
     pass
 
 
-def add_sets_to_workout_session(event: events.SetsCompleted, uow: AbstractUnitOfWork):
+def add_sets_to_workout_session(
+    event: events.SetsCompleted, uow: unit_of_work.AbstractUnitOfWork
+):
     with uow:
         workout_sessions = uow.repo.get([event.session_id])
         if len(workout_sessions) == 1:
@@ -49,7 +55,7 @@ def add_sets_to_workout_session(event: events.SetsCompleted, uow: AbstractUnitOf
 
 
 def get_sessions(
-    event: events.SessionsRequested, uow: AbstractUnitOfWork
+    event: events.SessionsRequested, uow: unit_of_work.AbstractUnitOfWork
 ) -> List[WorkoutSession]:
     if event.date_range is None:
         return list_all_sessions(uow)
@@ -58,6 +64,6 @@ def get_sessions(
         raise NotImplementedError
 
 
-def list_all_sessions(uow: AbstractUnitOfWork) -> List[WorkoutSession]:
+def list_all_sessions(uow: unit_of_work.AbstractUnitOfWork) -> List[WorkoutSession]:
     with uow:
         return uow.repo.list()
