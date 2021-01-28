@@ -2,7 +2,6 @@ import abc
 from typing import Callable, Iterable
 from wof.domain import events
 from wof.adapters.mongo_db import MongoSession
-from wof.service_layer import messagebus
 
 from wof.adapters.repository import (
     BaseWorkoutSessionRepository,
