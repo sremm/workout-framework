@@ -3,7 +3,7 @@ from typing import List
 
 from wof.adapters import repository
 from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.service_layer import services, unit_of_work
+from wof.service_layer import handlers, unit_of_work
 
 
 class FakeRepository(repository.BaseWorkoutSessionRepository):
@@ -44,7 +44,7 @@ class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
 def test_add_workout_sessions():
     uow = FakeUnitOfWork()
     sessions = [WorkoutSession()]
-    services.add_workout_sessions(sessions, uow)
+    handlers.add_workout_sessions(sessions, uow)
     assert len(uow.repo.list()) == 1
     assert uow.committed == True
 
@@ -52,14 +52,14 @@ def test_add_workout_sessions():
 def test_add_set_to_existing_session():
     uow = FakeUnitOfWork()
     session = WorkoutSession()
-    services.add_workout_sessions([session], uow)
+    handlers.add_workout_sessions([session], uow)
 
     sets = [
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=1),
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=2),
     ]
-    services.add_sets_to_workout_session(sets, session.id, uow)
+    handlers.add_sets_to_workout_session(sets, session.id, uow)
 
-    fetched_session = services.list_all_sessions(uow)[0]
+    fetched_session = handlers.list_all_sessions(uow)[0]
     number_of_sets = len(fetched_session)
     assert number_of_sets == 2

@@ -10,7 +10,7 @@ from fastapi import FastAPI, File, UploadFile
 from wof.service_layer import unit_of_work
 from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.import_logic import intensity_app
-from wof.service_layer import services
+from wof.service_layer import handlers
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
 
@@ -30,7 +30,7 @@ def startup():
 
 @app.put("/workout_sessions", tags=["workout_sessions"])
 async def add_workout_session(workout_sets: List[WorkoutSet]):
-    session_ids = services.add_workout_sessions(
+    session_ids = handlers.add_workout_sessions(
         [WorkoutSession(sets=workout_sets)], uow["uow"]
     )
     return {"workout_session_ids": session_ids}
@@ -40,7 +40,7 @@ async def add_workout_session(workout_sets: List[WorkoutSet]):
 async def add_sets_to_workout_session(
     workout_session_id: str, workout_sets: List[WorkoutSet]
 ):
-    added_sets = services.add_sets_to_workout_session(
+    added_sets = handlers.add_sets_to_workout_session(
         workout_sets, workout_session_id, uow["uow"]
     )
     return {
@@ -52,15 +52,15 @@ async def add_sets_to_workout_session(
     "/workout_sessions", response_model=List[WorkoutSession], tags=["workout_sessions"]
 )
 async def all_workout_sessions():
-    all_sessions = services.list_all_sessions(uow["uow"])
+    all_sessions = handlers.list_all_sessions(uow["uow"])
     return all_sessions
 
 
 @app.post("/intensity_export", tags=["workout_sessions"])
 def allococate_in_batch(file: UploadFile = File(...)):
     workout_sessions = intensity_app.import_from_file(file.file)
-    services.add_workout_sessions(workout_sessions, uow["uow"])
-    return {"number_of_sessions": len(services.list_all_sessions(uow["uow"]))}
+    handlers.add_workout_sessions(workout_sessions, uow["uow"])
+    return {"number_of_sessions": len(handlers.list_all_sessions(uow["uow"]))}
 
 
 if __name__ == "__main__":
