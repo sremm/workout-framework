@@ -1,7 +1,7 @@
 from typing import List
 
 from wof.domain import events
-from wof.domain.model import WorkoutSession, WorkoutSet
+from wof.domain.model import WorkoutSession
 from wof.service_layer.unit_of_work import AbstractUnitOfWork
 
 
