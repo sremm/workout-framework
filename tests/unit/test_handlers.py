@@ -49,7 +49,7 @@ def test_add_workout_sessions():
     assert uow.committed == True
 
 
-def test_add_set_to_existing_session():
+def test_add_set_to_existing_session_and_list_all_session():
     uow = FakeUnitOfWork()
     session = WorkoutSession()
     sessions_event = events.SessionsToAdd(sessions=[session])
