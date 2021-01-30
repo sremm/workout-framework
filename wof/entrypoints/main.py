@@ -11,7 +11,7 @@ from wof.service_layer import unit_of_work
 from wof.domain import events
 from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.import_logic import intensity_app
-from wof.service_layer import handlers
+from wof.service_layer import messagebus
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
 
@@ -31,9 +31,10 @@ def startup():
 
 @app.put("/workout_sessions", tags=["workout_sessions"])
 async def add_workout_session(workout_sets: List[WorkoutSet]):
-    session_ids = handlers.add_workout_sessions(
+    results = messagebus.handle(
         events.SessionsToAdd(sessions=[WorkoutSession(sets=workout_sets)]), uow["uow"]
     )
+    session_ids = results.pop(0)
     return {"workout_session_ids": session_ids}
 
 
@@ -41,10 +42,11 @@ async def add_workout_session(workout_sets: List[WorkoutSet]):
 async def add_sets_to_workout_session(
     workout_session_id: str, workout_sets: List[WorkoutSet]
 ):
-    added_sets = handlers.add_sets_to_workout_session(
+    results = messagebus.handle(
         events.SetsCompleted(sets=workout_sets, session_id=workout_session_id),
         uow["uow"],
     )
+    added_sets = results.pop(0)
     return {
         "msg": f"{len(added_sets)} set(s) added to workout session {workout_session_id}"
     }
@@ -54,16 +56,19 @@ async def add_sets_to_workout_session(
     "/workout_sessions", response_model=List[WorkoutSession], tags=["workout_sessions"]
 )
 async def all_workout_sessions():
-    all_sessions = handlers.list_all_sessions(uow["uow"])
+    results = messagebus.handle(events.SessionsRequested(date_range=None), uow["uow"])
+    all_sessions = results.pop(0)
     return all_sessions
 
 
 @app.post("/intensity_export", tags=["workout_sessions"])
 def import_intensity_app_data(file: UploadFile = File(...)):
+    # TODO change to ImportRequested event
     workout_sessions = intensity_app.import_from_file(file.file)
-    added_session_ids = handlers.add_workout_sessions(
+    results = messagebus.handle(
         events.SessionsToAdd(sessions=workout_sessions), uow["uow"]
     )
+    added_session_ids = results.pop(0)
     return {"number_of_sessions": len(added_session_ids)}
 
 
