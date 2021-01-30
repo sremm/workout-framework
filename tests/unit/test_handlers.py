@@ -3,7 +3,7 @@ from typing import List
 from wof.adapters import repository
 from wof.domain import events
 from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.service_layer import handlers, unit_of_work
+from wof.service_layer import unit_of_work, messagebus
 
 
 class FakeRepository(repository.BaseWorkoutSessionRepository):
@@ -44,7 +44,7 @@ class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
 def test_add_workout_sessions():
     uow = FakeUnitOfWork()
     event = events.SessionsToAdd(sessions=[WorkoutSession()])
-    handlers.add_workout_sessions(event, uow)
+    messagebus.handle(event, uow)
     assert len(uow.repo.list()) == 1
     assert uow.committed == True
 
@@ -53,15 +53,17 @@ def test_add_set_to_existing_session():
     uow = FakeUnitOfWork()
     session = WorkoutSession()
     sessions_event = events.SessionsToAdd(sessions=[session])
-    handlers.add_workout_sessions(sessions_event, uow)
+    messagebus.handle(sessions_event, uow)
 
     sets = [
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=1),
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=2),
     ]
     sets_event = events.SetsCompleted(session_id=session.id, sets=sets)
-    handlers.add_sets_to_workout_session(sets_event, uow)
+    messagebus.handle(sets_event, uow)
 
-    fetched_session = handlers.list_all_sessions(uow)[0]
+    results = messagebus.handle(events.SessionsRequested(date_range=None), uow)
+    first_result = results[0]
+    fetched_session = first_result[0]
     number_of_sets = len(fetched_session)
     assert number_of_sets == 2
