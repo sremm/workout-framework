@@ -1,6 +1,5 @@
 import abc
-from typing import Callable, Iterable
-from wof.domain import events
+from typing import Callable
 from wof.adapters.mongo_db import MongoSession
 
 from wof.adapters.repository import (
@@ -22,16 +21,10 @@ class AbstractUnitOfWork(abc.ABC):
     def commit(self):
         self._commit()
 
-    #     self.publish_events()
-
-    # def publish_events(self):
-    #     for session in self.repo.seen:
-    #         while session.events:
-    #             event = session.events.pop(0)
-    #             messagebus.handle(event)
-
-    def collect_new_events(self) -> Iterable[events.Event]:
-        return []
+    def collect_new_events(self):
+        for session in self.repo.seen:
+            while session.events:
+                yield session.events.pop(0)
 
     @abc.abstractmethod
     def _commit(self):

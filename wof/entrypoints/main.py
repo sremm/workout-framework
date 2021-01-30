@@ -8,6 +8,7 @@ import config
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
 from wof.service_layer import unit_of_work
+from wof.domain import events
 from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.import_logic import intensity_app
 from wof.service_layer import handlers
@@ -31,7 +32,7 @@ def startup():
 @app.put("/workout_sessions", tags=["workout_sessions"])
 async def add_workout_session(workout_sets: List[WorkoutSet]):
     session_ids = handlers.add_workout_sessions(
-        [WorkoutSession(sets=workout_sets)], uow["uow"]
+        events.SessionsToAdd(sessions=[WorkoutSession(sets=workout_sets)]), uow["uow"]
     )
     return {"workout_session_ids": session_ids}
 
@@ -41,7 +42,8 @@ async def add_sets_to_workout_session(
     workout_session_id: str, workout_sets: List[WorkoutSet]
 ):
     added_sets = handlers.add_sets_to_workout_session(
-        workout_sets, workout_session_id, uow["uow"]
+        events.SetsCompleted(sets=workout_sets, session_id=workout_session_id),
+        uow["uow"],
     )
     return {
         "msg": f"{len(added_sets)} set(s) added to workout session {workout_session_id}"
@@ -57,10 +59,12 @@ async def all_workout_sessions():
 
 
 @app.post("/intensity_export", tags=["workout_sessions"])
-def allococate_in_batch(file: UploadFile = File(...)):
+def import_intensity_app_data(file: UploadFile = File(...)):
     workout_sessions = intensity_app.import_from_file(file.file)
-    handlers.add_workout_sessions(workout_sessions, uow["uow"])
-    return {"number_of_sessions": len(handlers.list_all_sessions(uow["uow"]))}
+    added_session_ids = handlers.add_workout_sessions(
+        events.SessionsToAdd(sessions=workout_sessions), uow["uow"]
+    )
+    return {"number_of_sessions": len(added_session_ids)}
 
 
 if __name__ == "__main__":
