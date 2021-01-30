@@ -8,7 +8,7 @@ import config
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
 from wof.service_layer import unit_of_work
-from wof.domain import events
+from wof.domain import events, commands
 from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.import_logic import intensity_app
 from wof.service_layer import messagebus
@@ -32,7 +32,7 @@ def startup():
 @app.put("/workout_sessions", tags=["workout_sessions"])
 async def add_workout_session(workout_sets: List[WorkoutSet]):
     results = messagebus.handle(
-        events.SessionsToAdd(sessions=[WorkoutSession(sets=workout_sets)]), uow["uow"]
+        commands.AddSessions(sessions=[WorkoutSession(sets=workout_sets)]), uow["uow"]
     )
     session_ids = results.pop(0)
     return {"workout_session_ids": session_ids}
@@ -43,7 +43,7 @@ async def add_sets_to_workout_session(
     workout_session_id: str, workout_sets: List[WorkoutSet]
 ):
     results = messagebus.handle(
-        events.SetsCompleted(sets=workout_sets, session_id=workout_session_id),
+        commands.AddSetsToSession(sets=workout_sets, session_id=workout_session_id),
         uow["uow"],
     )
     added_sets = results.pop(0)
@@ -56,7 +56,7 @@ async def add_sets_to_workout_session(
     "/workout_sessions", response_model=List[WorkoutSession], tags=["workout_sessions"]
 )
 async def all_workout_sessions():
-    results = messagebus.handle(events.SessionsRequested(date_range=None), uow["uow"])
+    results = messagebus.handle(commands.GetSessions(date_range=None), uow["uow"])
     all_sessions = results.pop(0)
     return all_sessions
 
@@ -66,7 +66,7 @@ def import_intensity_app_data(file: UploadFile = File(...)):
     # TODO change to ImportRequested event
     workout_sessions = intensity_app.import_from_file(file.file)
     results = messagebus.handle(
-        events.SessionsToAdd(sessions=workout_sessions), uow["uow"]
+        commands.AddSessions(sessions=workout_sessions), uow["uow"]
     )
     added_session_ids = results.pop(0)
     return {"number_of_sessions": len(added_session_ids)}

@@ -1,26 +1,24 @@
 from typing import List
 
-from wof.domain import events
+from wof.domain import commands
 from wof.domain.model import WorkoutSession
 from wof.service_layer import unit_of_work
 
 
-def import_sessions(
-    event: events.ImportRequested, uow: unit_of_work.AbstractUnitOfWork
-):
-    def _convert(event: events.ImportRequested) -> events.SessionsToAdd:
-        return events.SessionsToAdd(sessions=[])
+def import_sessions(command: commands.ImportData, uow: unit_of_work.AbstractUnitOfWork):
+    def _convert(command: commands.ImportData) -> commands.AddSessions:
+        return commands.AddSessions(sessions=[])
 
     # convert to sessions
-    sessions_to_add = _convert(event)
+    sessions_to_add = _convert(command)
     add_workout_sessions(sessions_to_add, uow)
 
 
 def add_workout_sessions(
-    event: events.SessionsToAdd, uow: unit_of_work.AbstractUnitOfWork
+    command: commands.AddSessions, uow: unit_of_work.AbstractUnitOfWork
 ) -> List:
     with uow:
-        added_session_ids = uow.repo.add(event.sessions)
+        added_session_ids = uow.repo.add(command.sessions)
         uow.commit()
     return added_session_ids
 
@@ -34,33 +32,33 @@ class DuplicateSessions(Exception):
 
 
 def add_sets_to_workout_session(
-    event: events.SetsCompleted, uow: unit_of_work.AbstractUnitOfWork
+    command: commands.AddSetsToSession, uow: unit_of_work.AbstractUnitOfWork
 ):
     with uow:
-        workout_sessions = uow.repo.get([event.session_id])
+        workout_sessions = uow.repo.get([command.session_id])
         if len(workout_sessions) == 1:
-            uow.repo.update(event.session_id, event.sets)
+            uow.repo.update(command.session_id, command.sets)
             uow.commit()
 
         elif len(workout_sessions) == 0:
             raise InvalidSessionId(
-                f"Found no workout sessions with {event.session_id=}"
+                f"Found no workout sessions with {command.session_id=}"
             )
         else:
             raise DuplicateSessions(
-                f"Found {len(workout_sessions)} sessions with {event.session_id=}, but should only get one"
+                f"Found {len(workout_sessions)} sessions with {command.session_id=}, but should only get one"
             )
 
-    return event.sets
+    return command.sets
 
 
 def get_sessions(
-    event: events.SessionsRequested, uow: unit_of_work.AbstractUnitOfWork
+    command: commands.GetSessions, uow: unit_of_work.AbstractUnitOfWork
 ) -> List[WorkoutSession]:
-    if event.date_range is None:
+    if command.date_range is None:
         return list_all_sessions(uow)
     else:
-        # return sessions within event.date_range
+        # return sessions within command.date_range
         raise NotImplementedError
 
 

@@ -1,7 +1,7 @@
 from typing import List
 
 from wof.adapters import repository
-from wof.domain import events
+from wof.domain import events, commands
 from wof.domain.model import WorkoutSession, WorkoutSet
 from wof.service_layer import unit_of_work, messagebus
 
@@ -43,8 +43,8 @@ class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
 
 def test_add_workout_sessions():
     uow = FakeUnitOfWork()
-    event = events.SessionsToAdd(sessions=[WorkoutSession()])
-    messagebus.handle(event, uow)
+    command = commands.AddSessions(sessions=[WorkoutSession()])
+    messagebus.handle(command, uow)
     assert len(uow.repo.list()) == 1
     assert uow.committed == True
 
@@ -52,17 +52,17 @@ def test_add_workout_sessions():
 def test_add_set_to_existing_session_and_list_all_session():
     uow = FakeUnitOfWork()
     session = WorkoutSession()
-    sessions_event = events.SessionsToAdd(sessions=[session])
-    messagebus.handle(sessions_event, uow)
+    command = commands.AddSessions(sessions=[session])
+    messagebus.handle(command, uow)
 
     sets = [
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=1),
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=2),
     ]
-    sets_event = events.SetsCompleted(session_id=session.id, sets=sets)
-    messagebus.handle(sets_event, uow)
+    command = commands.AddSetsToSession(session_id=session.id, sets=sets)
+    messagebus.handle(command, uow)
 
-    results = messagebus.handle(events.SessionsRequested(date_range=None), uow)
+    results = messagebus.handle(commands.GetSessions(date_range=None), uow)
     first_result = results[0]
     fetched_session = first_result[0]
     number_of_sets = len(fetched_session)
