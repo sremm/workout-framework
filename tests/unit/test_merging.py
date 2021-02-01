@@ -1,6 +1,6 @@
 from datetime import datetime
 from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
-from wof.import_logic.data_merging import (
+from wof.import_workflows.data_merging import (
     merge_polar_and_instensity_imports,
     add_sets_from_sessions,
 )
