@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Literal, Optional
 
 import datetime
 from pydantic import BaseModel
@@ -32,4 +32,5 @@ class GetSessions(Command):
 
 
 class ImportData(Command):
-    pass
+    source: Literal["IntensityApp", "Polar"]
+    payload: Any
