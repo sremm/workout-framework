@@ -4,16 +4,16 @@ import pika, sys, os
 
 
 def main():
-    pass
-    ## connect to channel
-    # connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost"))
-    # channel = connection.channel()
+    # connect to channel
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost"))
+    channel = connection.channel()
 
-    # channel.queue_declare(queue="hello")
+    channel.queue_declare(queue="hello")
 
-    ## define callback - these will map to import
+    # # define callback - these will map to import
     # def callback(ch, method, properties, body):
     #     print(" [x] Received %r" % body)
+    #     return body
 
     # channel.basic_consume(queue="hello", on_message_callback=callback, auto_ack=True)
 
