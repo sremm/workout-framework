@@ -1,8 +1,7 @@
 from typing import List, Optional
 
-import datetime
 from pydantic import BaseModel
-from wof.domain.model import WorkoutSession, WorkoutSet
+from wof.domain.model import WorkoutSession, WorkoutSet, DateTimeRange
 
 
 class Command(BaseModel):
@@ -20,11 +19,6 @@ class AddSessions(Command):
 class AddSetsToSession(Command):
     session_id: str
     sets: List[WorkoutSet]
-
-
-class DateTimeRange(BaseModel):
-    start: datetime.date
-    end: datetime.date
 
 
 class GetSessions(Command):
