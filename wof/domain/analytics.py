@@ -25,7 +25,7 @@ class WorkoutSetStats(BaseModel):
             else:
                 return WorkoutSetStats(
                     total_reps=workout_set.reps,
-                    total_weight=workout_set.weights * workout_set.reps,
+                    total_weight=workout_set.weights * workout_set.reps,  # type ignore
                     exercises=(workout_set.exercise,),
                 )
 
@@ -93,8 +93,8 @@ def compute_merged_set_stats(
 ) -> WorkoutSetStats:
     stats: List[WorkoutSetStats] = [
         WorkoutSetStats.compute(session.sets) for session in sessions
-    ]
-    result: WorkoutSetStats = sum(stats, start=WorkoutSetStats.empty_stats())
+    ]  # type: ignore
+    result: WorkoutSetStats = sum(stats, start=WorkoutSetStats.empty_stats())  # type: ignore
     return result
 
 

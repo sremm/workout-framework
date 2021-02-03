@@ -16,7 +16,7 @@ def mongo_session_factory(mongo_settings: MongoSettings):
 
 
 class MongoSession:
-    def __init__(self, mongo_settings: Optional[ MongoSettings] = None) -> None:
+    def __init__(self, mongo_settings: Optional[MongoSettings] = None) -> None:
         self._mongo_settings = (
             MongoSettings() if mongo_settings is None else mongo_settings
         )
@@ -24,7 +24,7 @@ class MongoSession:
             self._mongo_settings.mongo_host, self._mongo_settings.mongo_port
         )
         # start session and transaction
-        self._uncommited: Dict[Dict] = {}
+        self._uncommited: Dict[str, Dict] = {}
         self._uncommited_updates: Dict = {}
         self._commited: bool = True
         self._db = self._client[self._mongo_settings.mongo_database]
