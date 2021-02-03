@@ -67,6 +67,13 @@ class MongoSession:
             WorkoutSession(**x) for x in self._uncommited.values()
         ]
 
+    def find(self, *args) -> List[Dict]:
+        """
+        passes args to MongoDB's colllection.find() method
+        returns the results
+        """
+        return list(self._collection.find(*args))
+
     def commit(self) -> None:
         for session_dict in self._uncommited.values():
             session_dict["_id"] = ObjectId(session_dict["_id"])
