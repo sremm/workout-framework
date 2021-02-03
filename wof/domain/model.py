@@ -13,8 +13,8 @@ from pydantic import BaseModel, Field
 
 
 class DateTimeRange(BaseModel):
-    start: Optional[datetime]
-    end: Optional[datetime]
+    start: datetime
+    end: datetime
 
 
 class Exercise(BaseModel):

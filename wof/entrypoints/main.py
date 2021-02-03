@@ -1,15 +1,17 @@
 """ Simple api with FastAPI to interact with workout-framework """
 
 import logging
-from typing import List
+from typing import List, Optional
+
+from fastapi.param_functions import Body
 from wof.adapters.mongo_db import mongo_session_factory
 
 import config
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
 from wof.service_layer import unit_of_work
-from wof.domain import events, commands
-from wof.domain.model import WorkoutSession, WorkoutSet
+from wof.domain import events, commands, views
+from wof.domain.model import WorkoutSession, WorkoutSet, DateTimeRange
 from wof.import_logic import intensity_app
 from wof.service_layer import messagebus
 
@@ -55,15 +57,16 @@ async def add_sets_to_workout_session(
 @app.get(
     "/workout_sessions", response_model=List[WorkoutSession], tags=["workout_sessions"]
 )
-async def all_workout_sessions():
-    results = messagebus.handle(commands.GetSessions(date_range=None), uow["uow"])
-    all_sessions = results.pop(0)
-    return all_sessions
+async def workout_sessions_in_datetime_range(
+    datetime_range: Optional[DateTimeRange] = Body(None),
+):
+    results = views.workout_sessions(datetime_range, uow["uow"])
+    return results
 
 
 @app.post("/intensity_export", tags=["workout_sessions"])
 def import_intensity_app_data(file: UploadFile = File(...)):
-    # TODO change to ImportRequested event
+    # TODO change to ImportRequested event/command
     workout_sessions = intensity_app.import_from_file(file.file)
     results = messagebus.handle(
         commands.AddSessions(sessions=workout_sessions), uow["uow"]

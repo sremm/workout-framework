@@ -3,9 +3,6 @@ from datetime import datetime
 import threading
 from typing import List
 
-import pytest
-from pymongo import MongoClient
-from wof.adapters.mongo_db import MongoSettings, mongo_session_factory
 from wof.domain import model
 from wof.service_layer.unit_of_work import MongoUnitOfWork
 import time
