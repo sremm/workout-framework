@@ -76,6 +76,19 @@ def import_intensity_app_data(file: UploadFile = File(...)):
 
 
 if __name__ == "__main__":
+    import argparse
+    import os
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--use-local-db",
+        action="store_true",
+        help="Use local db even when a remote db host is set",
+    )
+    args = parser.parse_args()
+    if args.use_local_db:
+        os.environ["MONGO_HOST"] = "localhost"
+
     uvicorn.run(
         app, host=config.api_settings.api_host, port=config.api_settings.api_port
     )
