@@ -1,7 +1,6 @@
 from typing import List
 
-from wof.domain import commands, views
-from wof.domain.model import WorkoutSession
+from wof.domain import commands
 from wof.service_layer import unit_of_work
 
 
