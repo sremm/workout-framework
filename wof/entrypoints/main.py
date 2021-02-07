@@ -31,6 +31,7 @@ class Handle:
         if self._func is not None:
             return self._func(message)
         else:
+            logging.warning("Called handle without a composed function")
             return []
 
 
