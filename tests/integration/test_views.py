@@ -21,7 +21,8 @@ def test_workout_sessions_view(mongo_session_factory_instance):
     datetime_range = DateTimeRange(
         start=datetime(2020, 1, 2, 0), end=datetime(2020, 1, 3, 0)
     )
-    results = views.workout_sessions(datetime_range, uow)
+    command = commands.GetSessions(date_range=datetime_range)
+    results = messagebus.handle(command, uow)
     del results[0]["id"]
     del results[0]["_id"]
     assert results == [

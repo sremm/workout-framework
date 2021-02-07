@@ -60,10 +60,7 @@ def test_add_set_to_existing_session_and_list_all_session():
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=2),
     ]
     command = commands.AddSetsToSession(session_id=session.id, sets=sets)
-    messagebus.handle(command, uow)
+    result = messagebus.handle(command, uow)
+    added_sets = result[0]
 
-    results = messagebus.handle(commands.GetSessions(date_range=None), uow)
-    first_result = results[0]
-    fetched_session = first_result[0]
-    number_of_sets = len(fetched_session)
-    assert number_of_sets == 2
+    assert len(added_sets) == 2
