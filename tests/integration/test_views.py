@@ -1,11 +1,20 @@
-from wof.domain.model import WorkoutSession, DateTimeRange
-from wof.domain import commands, views
-from wof.service_layer import messagebus
 from datetime import datetime
+
+import pytest
+from wof.bootstrap import bootstrap_handle
+from wof.domain import commands, views
+from wof.domain.model import DateTimeRange, WorkoutSession
+from wof.service_layer import messagebus
 from wof.service_layer.unit_of_work import MongoUnitOfWork
 
 
-def test_workout_sessions_view(mongo_session_factory_instance):
+@pytest.fixture
+def mongo_bus_handle(mongo_session_factory_instance):
+    uow = MongoUnitOfWork(mongo_session_factory_instance)
+    return bootstrap_handle(uow)
+
+
+def test_workout_sessions_view(mongo_bus_handle):
     # add three sessions
     command = commands.AddSessions(
         sessions=[
@@ -14,15 +23,14 @@ def test_workout_sessions_view(mongo_session_factory_instance):
             WorkoutSession(start_time=datetime(2020, 1, 3, 15)),
         ]
     )
-    uow = MongoUnitOfWork(mongo_session_factory_instance)
-    messagebus.handle(command, uow)
+    mongo_bus_handle(command)
 
     # create daterange to include only 1
     datetime_range = DateTimeRange(
         start=datetime(2020, 1, 2, 0), end=datetime(2020, 1, 3, 0)
     )
     command = commands.GetSessions(date_range=datetime_range)
-    results = messagebus.handle(command, uow)
+    results = mongo_bus_handle(command)
     result = results[0]
     del result[0]["id"]
     del result[0]["_id"]
