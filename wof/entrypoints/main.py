@@ -1,19 +1,17 @@
 """ Simple api with FastAPI to interact with workout-framework """
 
 import logging
+from datetime import datetime
 from typing import List, Optional
-
-from fastapi.param_functions import Body
-from wof.adapters.mongo_db import mongo_session_factory
 
 import config
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
-from wof.service_layer import unit_of_work
-from wof.domain import events, commands, views
-from wof.domain.model import WorkoutSession, WorkoutSet, DateTimeRange
+from wof.adapters.mongo_db import mongo_session_factory
+from wof.domain import commands, events, views
+from wof.domain.model import DateTimeRange, WorkoutSession, WorkoutSet
 from wof.import_workflows import intensity_app
-from wof.service_layer import messagebus
+from wof.service_layer import messagebus, unit_of_work
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
 
@@ -57,15 +55,16 @@ async def add_sets_to_workout_session(
 @app.get(
     "/workout_sessions", response_model=List[WorkoutSession], tags=["workout_sessions"]
 )
-async def workout_sessions_in_datetime_range(
-    datetime_range: Optional[DateTimeRange] = Body(None),
+async def in_datetime_range(
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
 ):
-    results = views.workout_sessions(datetime_range, uow["uow"])
+    results = views.workout_sessions(DateTimeRange(start=start, end=end), uow["uow"])
     return results
 
 
 @app.post("/intensity_export", tags=["workout_sessions"])
-def import_intensity_app_data(file: UploadFile = File(...)):
+def convert_and_add_sessions(file: UploadFile = File(...)):
     # TODO change to ImportRequested event/command
     workout_sessions = intensity_app.import_from_file(file.file)
     results = messagebus.handle(
