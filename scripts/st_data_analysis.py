@@ -1,7 +1,7 @@
 from pathlib import Path
 import pandas as pd
 
-from wof.import_logic import intensity_app
+from wof.import_workflows import intensity_app
 
 import streamlit as st
 

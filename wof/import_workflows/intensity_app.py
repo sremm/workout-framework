@@ -24,7 +24,7 @@ def _convert_to_sessions(data: pd.DataFrame) -> List[WorkoutSession]:
 
 
 def _group_by_date(data: pd.DataFrame) -> Dict[str, pd.DataFrame]:
-    dates: List[str] = list(data["Date"].unique())  # type: ignore
+    dates: List[str] = list(data["Date"].unique())
     return {date: data[data["Date"] == date] for date in dates}
 
 

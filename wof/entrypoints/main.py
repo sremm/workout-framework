@@ -12,7 +12,7 @@ from fastapi import FastAPI, File, UploadFile
 from wof.service_layer import unit_of_work
 from wof.domain import events, commands, views
 from wof.domain.model import WorkoutSession, WorkoutSet, DateTimeRange
-from wof.import_logic import intensity_app
+from wof.import_workflows import intensity_app
 from wof.service_layer import messagebus
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)

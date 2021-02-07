@@ -1,7 +1,7 @@
 from datetime import datetime
 from wof.domain.model import TimeSeries, WorkoutSet
-from wof.import_logic import intensity_app
-from wof.import_logic import polar
+from wof.import_workflows import intensity_app
+from wof.import_workflows import polar
 
 from pathlib import Path
 import pytest
