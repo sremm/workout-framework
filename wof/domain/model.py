@@ -12,6 +12,11 @@ from bson.objectid import ObjectId
 from pydantic import BaseModel, Field
 
 
+class DateTimeRange(BaseModel):
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+
+
 class Exercise(BaseModel):
     """
     Descriptor for an exercise

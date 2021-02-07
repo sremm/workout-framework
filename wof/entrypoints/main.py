@@ -1,17 +1,17 @@
 """ Simple api with FastAPI to interact with workout-framework """
 
 import logging
-from typing import List
-from wof.adapters.mongo_db import mongo_session_factory
+from datetime import datetime
+from typing import List, Optional
 
 import config
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
-from wof.service_layer import unit_of_work
-from wof.domain import events, commands
-from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.import_logic import intensity_app
-from wof.service_layer import messagebus
+from wof.adapters.mongo_db import mongo_session_factory
+from wof.domain import commands, events, views
+from wof.domain.model import DateTimeRange, WorkoutSession, WorkoutSet
+from wof.import_workflows import intensity_app
+from wof.service_layer import messagebus, unit_of_work
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
 
@@ -55,15 +55,17 @@ async def add_sets_to_workout_session(
 @app.get(
     "/workout_sessions", response_model=List[WorkoutSession], tags=["workout_sessions"]
 )
-async def all_workout_sessions():
-    results = messagebus.handle(commands.GetSessions(date_range=None), uow["uow"])
-    all_sessions = results.pop(0)
-    return all_sessions
+async def in_datetime_range(
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
+):
+    results = views.workout_sessions(DateTimeRange(start=start, end=end), uow["uow"])
+    return results
 
 
 @app.post("/intensity_export", tags=["workout_sessions"])
-def import_intensity_app_data(file: UploadFile = File(...)):
-    # TODO change to ImportRequested event
+def convert_and_add_sessions(file: UploadFile = File(...)):
+    # TODO change to ImportRequested event/command
     workout_sessions = intensity_app.import_from_file(file.file)
     results = messagebus.handle(
         commands.AddSessions(sessions=workout_sessions), uow["uow"]
@@ -73,6 +75,19 @@ def import_intensity_app_data(file: UploadFile = File(...)):
 
 
 if __name__ == "__main__":
+    import argparse
+    import os
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--use-local-db",
+        action="store_true",
+        help="Use local db even when a remote db host is set",
+    )
+    args = parser.parse_args()
+    if args.use_local_db:
+        os.environ["MONGO_HOST"] = "localhost"
+
     uvicorn.run(
         app, host=config.api_settings.api_host, port=config.api_settings.api_port
     )

@@ -1,5 +1,5 @@
 import abc
-from typing import Callable
+from typing import Callable, Any
 from wof.adapters.mongo_db import MongoSession
 
 from wof.adapters.repository import (
@@ -10,6 +10,7 @@ from wof.adapters.repository import (
 
 class AbstractUnitOfWork(abc.ABC):
     repo: BaseWorkoutSessionRepository
+    db_session: Any
 
     def __exit__(self, *args):
         self.rollback()
