@@ -23,9 +23,10 @@ def test_workout_sessions_view(mongo_session_factory_instance):
     )
     command = commands.GetSessions(date_range=datetime_range)
     results = messagebus.handle(command, uow)
-    del results[0]["id"]
-    del results[0]["_id"]
-    assert results == [
+    result = results[0]
+    del result[0]["id"]
+    del result[0]["_id"]
+    assert result == [
         {
             "sets": [],
             "start_time": datetime(2020, 1, 2, 17),

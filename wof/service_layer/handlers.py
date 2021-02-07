@@ -1,6 +1,6 @@
 from typing import List
 
-from wof.domain import commands
+from wof.domain import commands, views
 from wof.domain.model import WorkoutSession
 from wof.service_layer import unit_of_work
 
@@ -50,10 +50,3 @@ def add_sets_to_workout_session(
             )
 
     return command.sets
-
-
-def get_all_sessions(
-    command: commands.GetSessions, uow: unit_of_work.AbstractUnitOfWork
-) -> List[WorkoutSession]:
-    with uow:
-        return uow.repo.list()

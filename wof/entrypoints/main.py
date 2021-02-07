@@ -35,7 +35,6 @@ class Handle:
             return []
 
 
-uow = {}
 handle_composed = Handle()
 
 
@@ -44,8 +43,8 @@ def startup():
     """ Initialise database """
     db_settings = config.MongoSettings()
     session_factory = mongo_session_factory(db_settings)
-    uow["uow"] = unit_of_work.MongoUnitOfWork(session_factory=session_factory)
-    handle_composed.set_composed_handle(bootstrap_handle(uow=uow["uow"]))
+    uow = unit_of_work.MongoUnitOfWork(session_factory=session_factory)
+    handle_composed.set_composed_handle(bootstrap_handle(uow=uow))
 
 
 @app.put("/workout_sessions", tags=["workout_sessions"])
@@ -77,8 +76,11 @@ async def in_datetime_range(
     start: Optional[datetime] = None,
     end: Optional[datetime] = None,
 ):
-    results = views.workout_sessions(DateTimeRange(start=start, end=end), uow["uow"])
-    return results
+    results = handle_composed(
+        commands.GetSessions(date_range=DateTimeRange(start=start, end=end))
+    )
+    fetched_sessions = results.pop(0)
+    return fetched_sessions
 
 
 @app.post("/intensity_export", tags=["workout_sessions"])
