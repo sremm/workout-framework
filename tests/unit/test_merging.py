@@ -1,5 +1,5 @@
 from datetime import datetime
-from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
+from wof.domain.model import SessionType, TimeSeries, WorkoutSession, WorkoutSet
 from wof.import_workflows.data_merging import (
     merge_polar_and_instensity_imports,
     add_sets_from_sessions,
@@ -107,25 +107,33 @@ class TestPolarIntensityMerge:
 
     def test_multiple_polar_sessions_on_one_day(self):
         # if there are multiple sessions, then we should match to strenght training session
-        # if there are multple strenght sessions then we don't know really, what should the result be?
-        #       are there even such cases, we should at least not be able to assign intensity reps sets to all sessions on one day
+        # if there are multiple strenght sessions then we don't know really, but we will by default assign to the first strength training session
 
         polar_imports = [
             WorkoutSession(
-                id="polar1",
+                id="polar-other",
+                start_time=datetime(2020, 1, 1, 9, 0, 0, 0),
+                stop_time=datetime(2020, 1, 1, 10, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
+            ),
+            WorkoutSession(
+                id="polar-str-1",
+                type=SessionType(name="Strength training"),
+                start_time=datetime(2020, 1, 1, 15, 0, 0, 0),
+                stop_time=datetime(2020, 1, 1, 17, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
+            ),
+            WorkoutSession(
+                id="polar-str-2",
+                type=SessionType(name="Strength training"),
                 start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
                 stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
                 heart_rate=create_timeseries_entry(),
                 origin=["polar"],
             ),
-            WorkoutSession(
-                id="polar2",
-                start_time=datetime(2020, 1, 1, 20, 0, 0, 0),
-                stop_time=datetime(2020, 1, 1, 21, 0, 0, 0),
-                heart_rate=create_timeseries_entry(),
-                origin=["polar"],
-            ),
-        ]  # has no sets
+        ]
         intensity_imports = [
             WorkoutSession(
                 id="intensity",
@@ -133,14 +141,22 @@ class TestPolarIntensityMerge:
                 start_time=datetime(2020, 1, 1),
                 origin=["intensity"],
             ),
-        ]  # has no heart rate or stop time
+        ]
 
         result = merge_polar_and_instensity_imports(
             polar_sessions=polar_imports, intensity_sessions=intensity_imports
         )
         assert result == [
             WorkoutSession(
-                id="polar1",
+                id="polar-other",
+                start_time=datetime(2020, 1, 1, 9, 0, 0, 0),
+                stop_time=datetime(2020, 1, 1, 10, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
+            ),
+            WorkoutSession(
+                id="polar-str-1",
+                type=SessionType(name="Strength training"),
                 sets=[WorkoutSet(), WorkoutSet()],
                 start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
                 stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
@@ -149,7 +165,8 @@ class TestPolarIntensityMerge:
                 version=2,
             ),
             WorkoutSession(
-                id="polar2",
+                id="polar-str-2",
+                type=SessionType(name="Strength training"),
                 start_time=datetime(2020, 1, 1, 20, 0, 0, 0),
                 stop_time=datetime(2020, 1, 1, 21, 0, 0, 0),
                 heart_rate=create_timeseries_entry(),
