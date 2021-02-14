@@ -105,7 +105,7 @@ class TestPolarIntensityMerge:
             ),
         ]
 
-    def test_multiple_polart_sessions_on_one_day(self):
+    def test_multiple_polar_sessions_on_one_day(self):
         # if there are multiple sessions, then we should match to strenght training session
         # if there are multple strenght sessions then we don't know really, what should the result be?
         #       are there even such cases, we should at least not be able to assign intensity reps sets to all sessions on one day
