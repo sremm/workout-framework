@@ -1,9 +1,11 @@
 from typing import List
 
+import pytest
 from wof.adapters import repository
-from wof.domain import events, commands
+from wof.bootstrap import bootstrap_handle
+from wof.domain import commands, events
 from wof.domain.model import WorkoutSession, WorkoutSet
-from wof.service_layer import unit_of_work, messagebus
+from wof.service_layer import messagebus, unit_of_work
 
 
 class FakeRepository(repository.BaseWorkoutSessionRepository):
@@ -11,8 +13,9 @@ class FakeRepository(repository.BaseWorkoutSessionRepository):
         super().__init__()
         self._data: List[WorkoutSession] = []
 
-    def _add(self, sessions: List[WorkoutSession]) -> None:
-        return self._data.extend(sessions)
+    def _add(self, sessions: List[WorkoutSession]) -> List:
+        self._data.extend(sessions)
+        return [x.id for x in sessions]
 
     def _get(self, ids: List[str]) -> List[WorkoutSession]:
         return [x for x in self._data if x.id in ids]
@@ -41,29 +44,29 @@ class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
         pass
 
 
-def test_add_workout_sessions():
-    uow = FakeUnitOfWork()
+@pytest.fixture
+def fake_bus_handle():
+    return bootstrap_handle(uow=FakeUnitOfWork())
+
+
+def test_add_workout_sessions(fake_bus_handle):
     command = commands.AddSessions(sessions=[WorkoutSession()])
-    messagebus.handle(command, uow)
-    assert len(uow.repo.list()) == 1
-    assert uow.committed == True
+    results = fake_bus_handle(command)
+    result = results[0]
+    assert len(result) == 1
 
 
-def test_add_set_to_existing_session_and_list_all_session():
-    uow = FakeUnitOfWork()
+def test_add_set_to_existing_session_and_list_all_session(fake_bus_handle):
     session = WorkoutSession()
     command = commands.AddSessions(sessions=[session])
-    messagebus.handle(command, uow)
+    fake_bus_handle(command)
 
     sets = [
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=1),
         WorkoutSet(exercise="name", reps=1, weights=0, set_number=2),
     ]
     command = commands.AddSetsToSession(session_id=session.id, sets=sets)
-    messagebus.handle(command, uow)
+    result = fake_bus_handle(command)
+    added_sets = result[0]
 
-    results = messagebus.handle(commands.GetSessions(date_range=None), uow)
-    first_result = results[0]
-    fetched_session = first_result[0]
-    number_of_sets = len(fetched_session)
-    assert number_of_sets == 2
+    assert len(added_sets) == 2

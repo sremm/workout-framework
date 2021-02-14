@@ -1,18 +1,18 @@
-from typing import DefaultDict, List, Dict, Optional
+from typing import DefaultDict, List, Dict
 
 from wof.service_layer.unit_of_work import AbstractUnitOfWork
-from wof.domain.commands import DateTimeRange
+from wof.domain import commands
 
 
 def workout_sessions(
-    datetime_range: DateTimeRange, uow: AbstractUnitOfWork
+    command: commands.GetSessions, uow: AbstractUnitOfWork
 ) -> List[Dict]:
     def _get_query_args():
         result = DefaultDict(dict)
-        if datetime_range.start is not None:
-            result["start_time"]["$gt"] = datetime_range.start
-        if datetime_range.end is not None:
-            result["start_time"]["$lt"] = datetime_range.end
+        if command.date_range.start is not None:
+            result["start_time"]["$gt"] = command.date_range.start
+        if command.date_range.end is not None:
+            result["start_time"]["$lt"] = command.date_range.end
         return result
 
     with uow:

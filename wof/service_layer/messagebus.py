@@ -2,7 +2,7 @@ import logging
 from functools import singledispatch
 from typing import Callable, Dict, List, Union
 
-from wof.domain import commands, events
+from wof.domain import commands, events, views
 from wof.service_layer import handlers, unit_of_work
 
 Handler = Callable
@@ -16,7 +16,7 @@ EVENT_HANDLERS: Dict[events.Event, List[Handler]] = {
 COMMAND_HANDLERS: Dict[events.Event, Handler] = {
     commands.AddSessions: handlers.add_workout_sessions,
     commands.AddSetsToSession: handlers.add_sets_to_workout_session,
-    commands.GetSessions: handlers.get_sessions,
+    commands.GetSessions: views.workout_sessions,
 }  # type: ignore
 
 

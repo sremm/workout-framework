@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 import config
 import uvicorn
@@ -12,13 +12,30 @@ from wof.domain import commands, events, views
 from wof.domain.model import DateTimeRange, WorkoutSession, WorkoutSet
 from wof.import_workflows import intensity_app
 from wof.service_layer import messagebus, unit_of_work
+from wof.bootstrap import bootstrap_handle
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
 
 
 app = FastAPI()
 
-uow = {}
+
+class Handle:
+    def __init__(self) -> None:
+        self._func = None
+
+    def set_composed_handle(self, func: Callable):
+        self._func = func
+
+    def __call__(self, message: messagebus.Message) -> List:
+        if self._func is not None:
+            return self._func(message)
+        else:
+            logging.warning("Called handle without a composed function")
+            return []
+
+
+handle_composed = Handle()
 
 
 @app.on_event("startup")
@@ -26,13 +43,14 @@ def startup():
     """ Initialise database """
     db_settings = config.MongoSettings()
     session_factory = mongo_session_factory(db_settings)
-    uow["uow"] = unit_of_work.MongoUnitOfWork(session_factory=session_factory)
+    uow = unit_of_work.MongoUnitOfWork(session_factory=session_factory)
+    handle_composed.set_composed_handle(bootstrap_handle(uow=uow))
 
 
 @app.put("/workout_sessions", tags=["workout_sessions"])
 async def add_workout_session(workout_sets: List[WorkoutSet]):
-    results = messagebus.handle(
-        commands.AddSessions(sessions=[WorkoutSession(sets=workout_sets)]), uow["uow"]
+    results = handle_composed(
+        commands.AddSessions(sessions=[WorkoutSession(sets=workout_sets)])
     )
     session_ids = results.pop(0)
     return {"workout_session_ids": session_ids}
@@ -42,9 +60,8 @@ async def add_workout_session(workout_sets: List[WorkoutSet]):
 async def add_sets_to_workout_session(
     workout_session_id: str, workout_sets: List[WorkoutSet]
 ):
-    results = messagebus.handle(
+    results = handle_composed(
         commands.AddSetsToSession(sets=workout_sets, session_id=workout_session_id),
-        uow["uow"],
     )
     added_sets = results.pop(0)
     return {
@@ -59,17 +76,18 @@ async def in_datetime_range(
     start: Optional[datetime] = None,
     end: Optional[datetime] = None,
 ):
-    results = views.workout_sessions(DateTimeRange(start=start, end=end), uow["uow"])
-    return results
+    results = handle_composed(
+        commands.GetSessions(date_range=DateTimeRange(start=start, end=end))
+    )
+    fetched_sessions = results.pop(0)
+    return fetched_sessions
 
 
 @app.post("/intensity_export", tags=["workout_sessions"])
 def convert_and_add_sessions(file: UploadFile = File(...)):
     # TODO change to ImportRequested event/command
     workout_sessions = intensity_app.import_from_file(file.file)
-    results = messagebus.handle(
-        commands.AddSessions(sessions=workout_sessions), uow["uow"]
-    )
+    results = handle_composed(commands.AddSessions(sessions=workout_sessions))
     added_session_ids = results.pop(0)
     return {"number_of_sessions": len(added_session_ids)}
 
