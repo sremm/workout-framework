@@ -1,6 +1,10 @@
 from datetime import datetime
 from typing import List, Dict, Tuple
+
+from pydantic import BaseModel
 from wof.domain.model import WorkoutSession
+
+import copy
 
 
 def add_sets_from_sessions(
@@ -19,6 +23,23 @@ def are_on_same_day(time_1: datetime, time_2: datetime) -> bool:
     return _as_ymd(time_1) == _as_ymd(time_2)
 
 
+class PotentialDatetimeMatches(BaseModel):
+    match_base: datetime
+    matches: List[datetime]
+
+
+class PotentialMatchingResult(BaseModel):
+    potential_matches: List[PotentialDatetimeMatches]
+    unmatched_1: List[datetime]
+    unmatched_2: List[datetime]
+
+
+class FinalMatchingResult(BaseModel):
+    matches: List[Tuple[datetime, datetime]]
+    unmatched_1: List[datetime]
+    unmatched_2: List[datetime]
+
+
 def merge_polar_and_instensity_imports(
     polar_sessions: List[WorkoutSession], intensity_sessions: List[WorkoutSession]
 ) -> List[WorkoutSession]:
@@ -29,43 +50,75 @@ def merge_polar_and_instensity_imports(
 
     def _match_datetime_days(
         times_1: List[datetime], times_2: List[datetime]
-    ) -> Tuple[List[List[datetime]], List[datetime], List[datetime]]:
+    ) -> PotentialMatchingResult:
+        """ Datetime based matching """
         matched_start_times = []
         umatched_times_1 = []
         umatched_times_2 = []
-        matched_times_2 = []
-        # find matches for time_1
-        for time_1 in times_1:
-            found_match = False
-            # see if any time_2 matches time_1
-            for time_2 in times_2:
-                if time_2 not in matched_times_2 and are_on_same_day(time_1, time_2):
-                    found_match = True
-                    matched_start_times.append([time_1, time_2])
-                    matched_times_2.append(time_2)
-            if not found_match:
-                umatched_times_1.append(time_1)
-        # add all times 2 without match to result list
+        matched_times_1 = set()
         for time_2 in times_2:
-            if time_2 not in matched_times_2:
+            current_matches = []
+            # find all matches for time_2
+            for time_1 in times_1:
+                if are_on_same_day(time_1, time_2):
+                    current_matches.append(time_1)
+                    matched_times_1.add(time_1)
+            if current_matches != []:
+                matched_start_times.append(
+                    PotentialDatetimeMatches(match_base=time_2, matches=current_matches)
+                )
+            else:
                 umatched_times_2.append(time_2)
+        # add all times 1 without match to result list
+        for time_1 in times_1:
+            if time_1 not in matched_times_1:
+                umatched_times_1.append(time_1)
 
-        return matched_start_times, umatched_times_1, umatched_times_2
+        return PotentialMatchingResult(
+            potential_matches=matched_start_times,
+            unmatched_1=umatched_times_1,
+            unmatched_2=umatched_times_2,
+        )
+
+    def _match_session_type(
+        potential_results: PotentialMatchingResult,
+        polar: Dict[datetime, WorkoutSession],
+        intensity: Dict[datetime, WorkoutSession],
+    ) -> FinalMatchingResult:
+        final_matches = []
+        unmatched_1 = copy.copy(potential_results.unmatched_1)
+        unmatched_2 = copy.copy(potential_results.unmatched_2)
+        for potential_matches in potential_results.potential_matches:
+            int_session = intensity[potential_matches.match_base]
+            polar_sessions = [polar[x] for x in potential_matches.matches]
+            polar_matches = []
+            for polar_session in polar_sessions:
+                if polar_session.type == int_session.type:
+                    polar_matches.append(polar_session.start_time)
+            sorted_polar_matches = sorted(polar_matches)
+            first_polar_match = sorted_polar_matches.pop(0)
+            final_matches.append((int_session.start_time, first_polar_match))
+            unmatched_1.extend(polar_matches)  # all that is left is unmatched
+
+        return FinalMatchingResult(
+            matches=final_matches, unmatched_1=unmatched_1, unmatched_2=unmatched_2
+        )
 
     polar: Dict = _get_start_time_to_session_mapping(polar_sessions)
     intensity: Dict = _get_start_time_to_session_mapping(intensity_sessions)
-    (
-        matched_start_times,
-        unmatched_polar_times,
-        unmatched_intensity_times,
-    ) = _match_datetime_days(list(polar.keys()), list(intensity.keys()))
+    potential_matching = _match_datetime_days(
+        list(polar.keys()), list(intensity.keys())
+    )
+    final_matching = _match_session_type(
+        potential_matching, polar_sessions, intensity_sessions
+    )
     results = []
-    for matched_times in matched_start_times:
-        base_session = polar[matched_times.pop(0)]
-        sessions = [intensity[x] for x in matched_times]
+    for intensity_time, polar_time in final_matching.matches:
+        base_session = polar[polar_time]
+        sessions = [intensity[intensity_time]]
         results.append(add_sets_from_sessions(base_session, sessions))
-    for time in unmatched_polar_times:
+    for time in final_matching.unmatched_1:
         results.append(polar[time])
-    for time in unmatched_intensity_times:
+    for time in final_matching.unmatched_2:
         results.append(intensity[time])
     return results
