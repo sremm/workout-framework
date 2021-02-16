@@ -97,6 +97,8 @@ def merge_polar_and_instensity_imports(
             for polar_session in polar_sessions:
                 if polar_session.type == int_session.type:
                     polar_matches.append(polar_session.start_time)
+                else:
+                    unmatched_polar.append(polar_session.start_time)
             sorted_polar_matches = sorted(polar_matches)
             first_polar_match = sorted_polar_matches.pop(0)
             final_matches.append((int_session.start_time, first_polar_match))
@@ -125,4 +127,5 @@ def merge_polar_and_instensity_imports(
         results.append(polar[time])
     for time in final_matching.unmatched_intensity:
         results.append(intensity[time])
+    results = sorted(results)
     return results
