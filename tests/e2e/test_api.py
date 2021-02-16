@@ -71,6 +71,7 @@ def test_happy_path_add_session_add_sets_get_len(test_app):
         assert response.status_code == 200
         assert results == [
             {
+                "type": {"name": "Basic Workout"},
                 "sets": [set_data_1, set_data_2],
                 "id": workout_session_id,
                 "heart_rate": None,

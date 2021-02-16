@@ -64,16 +64,20 @@ def object_id_as_str(*args) -> str:
     return str(ObjectId(*args))
 
 
+class SessionType(BaseModel):
+    name: str = "Basic Workout"
+
+
 @total_ordering
 class WorkoutSession(BaseModel):
     """ Class for keeping track of session data """
 
+    type: SessionType = Field(default_factory=SessionType)
     sets: List[WorkoutSet] = Field(default_factory=list)
     id: str = Field(default_factory=object_id_as_str)
     start_time: datetime = Field(default_factory=datetime.now)
     stop_time: Optional[datetime] = None
     heart_rate: Optional[TimeSeries] = None
-    # sections: BaseSection # Could have sections instead sets here
     version: int = 1
     events: List = Field(default_factory=list)
     origin: List[str] = Field(default_factory=list)  # how session was created

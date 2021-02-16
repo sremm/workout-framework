@@ -36,6 +36,7 @@ def test_workout_sessions_view(mongo_bus_handle):
     del result[0]["_id"]
     assert result == [
         {
+            "type": {"name": "Basic Workout"},
             "sets": [],
             "start_time": datetime(2020, 1, 2, 17),
             "stop_time": None,
