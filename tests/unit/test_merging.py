@@ -128,8 +128,8 @@ class TestPolarIntensityMerge:
             WorkoutSession(
                 id="polar-str-2",
                 type=SessionType(name="Strength training"),
-                start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
-                stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
+                start_time=datetime(2020, 1, 1, 20, 0, 0, 0),
+                stop_time=datetime(2020, 1, 1, 21, 0, 0, 0),
                 heart_rate=create_timeseries_entry(),
                 origin=["polar"],
             ),
@@ -137,6 +137,7 @@ class TestPolarIntensityMerge:
         intensity_imports = [
             WorkoutSession(
                 id="intensity",
+                type=SessionType(name="Strength training"),
                 sets=[WorkoutSet(), WorkoutSet()],
                 start_time=datetime(2020, 1, 1),
                 origin=["intensity"],
@@ -158,8 +159,8 @@ class TestPolarIntensityMerge:
                 id="polar-str-1",
                 type=SessionType(name="Strength training"),
                 sets=[WorkoutSet(), WorkoutSet()],
-                start_time=datetime(2020, 1, 1, 17, 0, 0, 0),
-                stop_time=datetime(2020, 1, 1, 18, 0, 0, 0),
+                start_time=datetime(2020, 1, 1, 15, 0, 0, 0),
+                stop_time=datetime(2020, 1, 1, 17, 0, 0, 0),
                 heart_rate=create_timeseries_entry(),
                 origin=["polar", "intensity"],
                 version=2,
