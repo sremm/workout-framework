@@ -64,13 +64,13 @@ class TestPolarIntensityMerge:
         ]  # has no sets
         intensity_imports = [
             WorkoutSession(
-                id="intensity",
+                id="intensity1",
                 sets=[WorkoutSet(), WorkoutSet()],
                 start_time=datetime(2020, 1, 1),
                 origin=["intensity"],
             ),
             WorkoutSession(
-                id="intensity",
+                id="intensity2",
                 sets=[WorkoutSet()],
                 start_time=datetime(2020, 1, 3),
                 origin=["intensity"],
@@ -98,7 +98,7 @@ class TestPolarIntensityMerge:
                 origin=["polar"],
             ),
             WorkoutSession(
-                id="intensity",
+                id="intensity2",
                 sets=[WorkoutSet()],
                 start_time=datetime(2020, 1, 3),
                 origin=["intensity"],
