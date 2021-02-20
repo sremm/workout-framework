@@ -10,7 +10,7 @@ from fastapi import FastAPI, File, UploadFile
 from wof.adapters.mongo_db import mongo_session_factory
 from wof.domain import commands, events, views
 from wof.domain.model import DateTimeRange, WorkoutSession, WorkoutSet
-from wof.import_workflows import intensity_app
+from wof.import_workflows import intensity_app, polar
 from wof.service_layer import messagebus, unit_of_work
 from wof.bootstrap import bootstrap_handle
 
@@ -83,10 +83,17 @@ async def in_datetime_range(
     return fetched_sessions
 
 
-@app.post("/intensity_export", tags=["workout_sessions"])
-def convert_and_add_sessions(file: UploadFile = File(...)):
-    # TODO change to ImportRequested event/command
-    workout_sessions = intensity_app.import_from_file(file.file)
+@app.post("/import/intensity", tags=["workout_sessions"])
+def from_csv_file(file: UploadFile = File(...)):
+    workout_sessions = intensity_app.import_from_file(file.file._file)
+    results = handle_composed(commands.AddSessions(sessions=workout_sessions))
+    added_session_ids = results.pop(0)
+    return {"number_of_sessions": len(added_session_ids)}
+
+
+@app.post("/import/polar", tags=["workout_sessions"])
+def from_json_files(files: List[UploadFile] = File(...)):
+    workout_sessions = polar.load_all_sessions_in_folder(files)
     results = handle_composed(commands.AddSessions(sessions=workout_sessions))
     added_session_ids = results.pop(0)
     return {"number_of_sessions": len(added_session_ids)}
