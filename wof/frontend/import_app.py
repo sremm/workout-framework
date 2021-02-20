@@ -5,13 +5,13 @@ import config
 st.title("Data Importer")
 # define format selector
 export_format = st.selectbox("Export format", options=["Polar", "Intensity"])
-# define uploader 
+# define uploader
 if export_format == "Intensity":
     uploader_text = "Select your Intensity export csv file"
     uploader_kwargs = {"type": ["csv", "txt"]}
 elif export_format == "Polar":
     uploader_text = "Select your Polar export json files"
-    uploader_kwargs = {"type": ["json"],"accept_multiple_files":True}
+    uploader_kwargs = {"type": ["json"], "accept_multiple_files": True}
 else:
     uploader_text = "export format not supported"
     uploader_kwargs = {"type": [""]}
@@ -30,7 +30,8 @@ if st.button("Upload"):
             )
             st.write(res)
         elif export_format == "Polar":
-            files = {"files": uploaded}
+            files = [("files", x) for x in uploaded]
+            print(files)
             st.write("Starting upload")
             res = requests.post(
                 f"{config.get_api_url()}/import/polar",
