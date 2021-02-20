@@ -1,5 +1,6 @@
 """ Simple api with FastAPI to interact with workout-framework """
 
+import json
 import logging
 from datetime import datetime
 from typing import Callable, List, Optional
@@ -8,11 +9,11 @@ import config
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
 from wof.adapters.mongo_db import mongo_session_factory
+from wof.bootstrap import bootstrap_handle
 from wof.domain import commands, events, views
 from wof.domain.model import DateTimeRange, WorkoutSession, WorkoutSet
 from wof.import_workflows import intensity_app, polar
 from wof.service_layer import messagebus, unit_of_work
-from wof.bootstrap import bootstrap_handle
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
 
@@ -93,7 +94,9 @@ def from_csv_file(file: UploadFile = File(...)):
 
 @app.post("/import/polar", tags=["workout_sessions"])
 def from_json_files(files: List[UploadFile] = File(...)):
-    workout_sessions = polar.load_all_sessions_in_folder(files)
+    workout_sessions = polar.load_all_sessions_from_dicts(
+        [json.load(x.file) for x in files]
+    )
     results = handle_composed(commands.AddSessions(sessions=workout_sessions))
     added_session_ids = results.pop(0)
     return {"number_of_sessions": len(added_session_ids)}
