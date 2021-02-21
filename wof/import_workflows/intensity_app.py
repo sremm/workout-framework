@@ -18,7 +18,7 @@ def _convert_to_sessions(data: pd.DataFrame) -> List[WorkoutSession]:
     for date, group_data in grouped_data.items():
         sets = _convert_rows_to_sets(group_data)
         start_time = datetime.strptime(date, "%Y-%m-%d")
-        session = WorkoutSession(sets=sets, start_time=start_time)
+        session = WorkoutSession(name="Strength training",sets=sets, start_time=start_time)
         sessions.append(session)
     return sessions
 
