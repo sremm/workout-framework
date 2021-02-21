@@ -4,7 +4,7 @@ from tempfile import SpooledTemporaryFile
 from typing import Dict, List, Union
 
 import pandas as pd
-from wof.domain.model import WorkoutSession, WorkoutSet
+from wof.domain.model import WorkoutSession, WorkoutSet, SessionType
 
 
 def import_from_file(input: Union[SpooledTemporaryFile, Path]) -> List[WorkoutSession]:
@@ -18,7 +18,12 @@ def _convert_to_sessions(data: pd.DataFrame) -> List[WorkoutSession]:
     for date, group_data in grouped_data.items():
         sets = _convert_rows_to_sets(group_data)
         start_time = datetime.strptime(date, "%Y-%m-%d")
-        session = WorkoutSession(name="Strength training",sets=sets, start_time=start_time)
+        session = WorkoutSession(
+            type=SessionType(name="Strength training"),
+            sets=sets,
+            start_time=start_time,
+            origin=["intensity_app"],
+        )
         sessions.append(session)
     return sessions
 

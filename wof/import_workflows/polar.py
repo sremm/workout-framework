@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
-from wof.domain.model import TimeSeries, WorkoutSession
+from wof.domain.model import TimeSeries, WorkoutSession, SessionType
 
 
 class PolarFormatError(Exception):
@@ -40,7 +40,10 @@ def _convert_to_workout_session(data: Dict) -> WorkoutSession:
     )
 
     return WorkoutSession(
-        name=data["name"], start_time=start_time, heart_rate=heart_rate
+        type=SessionType(name=data["name"]),
+        start_time=start_time,
+        heart_rate=heart_rate,
+        origin=["polar"],
     )
 
 
