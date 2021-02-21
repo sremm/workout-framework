@@ -1,9 +1,10 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-from wof.domain.model import TimeSeries, WorkoutSession, SessionType
+import numpy as np
+from wof.domain.model import SessionType, TimeSeries, WorkoutSession
 
 
 class PolarFormatError(Exception):
@@ -21,13 +22,19 @@ def _polar_date_conversion(date: str) -> datetime:
     return datetime.strptime(date + "000", "%Y-%m-%dT%H:%M:%S.%f")
 
 
-def _convert_polar_samples(data: List[Dict], unit: str) -> TimeSeries:
+def _convert_polar_samples(data: List[Dict], unit: str) -> Optional[TimeSeries]:
     values = []
     time = []
     for sample in data:
-        values.append(sample["value"])
+        if "value" not in sample.keys():
+            values.append(np.nan)
+        else:
+            values.append(sample["value"])
         time.append(_polar_date_conversion(sample["dateTime"]))
-    return TimeSeries(values=values, time=time, unit=unit)
+    if np.all(np.isnan(values)):
+        return None
+    else:
+        return TimeSeries(values=values, time=time, unit=unit)
 
 
 def _convert_to_workout_session(data: Dict) -> WorkoutSession:
