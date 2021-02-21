@@ -39,7 +39,9 @@ def _convert_to_workout_session(data: Dict) -> WorkoutSession:
         data["exercises"][0]["samples"]["heartRate"], unit="bpm"
     )
 
-    return WorkoutSession(start_time=start_time, heart_rate=heart_rate)
+    return WorkoutSession(
+        name=data["name"], start_time=start_time, heart_rate=heart_rate
+    )
 
 
 def load_all_sessions_in_folder(path: Path) -> List[WorkoutSession]:
