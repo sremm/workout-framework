@@ -42,9 +42,13 @@ def _convert_to_workout_session(data: Dict) -> WorkoutSession:
 
     start_time = _polar_date_conversion(data["startTime"])
 
-    heart_rate = _convert_polar_samples(
-        data["exercises"][0]["samples"]["heartRate"], unit="bpm"
-    )
+    first_excerise_samples = data["exercises"][0]["samples"]
+    if "heartRate" in first_excerise_samples.keys():
+        heart_rate = _convert_polar_samples(
+            first_excerise_samples["heartRate"], unit="bpm"
+        )
+    else:
+        heart_rate = None
 
     return WorkoutSession(
         type=SessionType(name=data["name"]),
