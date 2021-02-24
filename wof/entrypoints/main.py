@@ -1,5 +1,6 @@
 """ Simple api with FastAPI to interact with workout-framework """
 
+import json
 import logging
 from datetime import datetime
 from typing import Callable, List, Optional
@@ -8,11 +9,11 @@ import config
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
 from wof.adapters.mongo_db import mongo_session_factory
+from wof.bootstrap import bootstrap_handle
 from wof.domain import commands, events, views
 from wof.domain.model import DateTimeRange, WorkoutSession, WorkoutSet
-from wof.import_workflows import intensity_app
+from wof.import_workflows import intensity_app, polar, data_merging
 from wof.service_layer import messagebus, unit_of_work
-from wof.bootstrap import bootstrap_handle
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
 
@@ -83,11 +84,36 @@ async def in_datetime_range(
     return fetched_sessions
 
 
-@app.post("/intensity_export", tags=["workout_sessions"])
-def convert_and_add_sessions(file: UploadFile = File(...)):
-    # TODO change to ImportRequested event/command
-    workout_sessions = intensity_app.import_from_file(file.file)
+@app.post("/import/intensity", tags=["workout_sessions"])
+def from_csv_file(file: UploadFile = File(...)):
+    workout_sessions = intensity_app.import_from_file(file.file._file)
     results = handle_composed(commands.AddSessions(sessions=workout_sessions))
+    added_session_ids = results.pop(0)
+    return {"number_of_sessions": len(added_session_ids)}
+
+
+@app.post("/import/polar", tags=["workout_sessions"])
+def from_json_files(files: List[UploadFile] = File(...)):
+    workout_sessions = polar.load_all_sessions_from_dicts(
+        [json.load(x.file) for x in files]
+    )
+    results = handle_composed(commands.AddSessions(sessions=workout_sessions))
+    added_session_ids = results.pop(0)
+    return {"number_of_sessions": len(added_session_ids)}
+
+
+@app.post("/import/polar_and_intensity_with_merge", tags=["workout_sessions"])
+def from_json_and_csv_files(
+    polar_files: List[UploadFile] = File(...), intensity_file: UploadFile = File(...)
+):
+    polar_sessions = polar.load_all_sessions_from_dicts(
+        [json.load(x.file) for x in polar_files]
+    )
+    intensity_sessions = intensity_app.import_from_file(intensity_file.file._file)
+    merged_sessions = data_merging.merge_polar_and_instensity_imports(
+        polar_sessions=polar_sessions, intensity_sessions=intensity_sessions
+    )
+    results = handle_composed(commands.AddSessions(sessions=merged_sessions))
     added_session_ids = results.pop(0)
     return {"number_of_sessions": len(added_session_ids)}
 

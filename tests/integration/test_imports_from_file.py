@@ -53,11 +53,11 @@ def sessions_from_polar():
 class TestImportFromPolar:
     def test_number_of_sessions(self, sessions_from_polar):
         number_of_sessions = len(sessions_from_polar)
-        assert number_of_sessions == 2
+        assert number_of_sessions == 3
 
     def test_validate_first_session(self, sessions_from_polar):
-        first_session = sessions_from_polar[0]
-        hr = first_session.heart_rate
+        session = sessions_from_polar[0]
+        hr = session.heart_rate
         assert hr == TimeSeries(
             values=[88, 89, 90],
             time=[
@@ -69,8 +69,13 @@ class TestImportFromPolar:
         )
 
     def test_validate_second_session(self, sessions_from_polar):
-        first_session = sessions_from_polar[1]
-        hr = first_session.heart_rate
+        session = sessions_from_polar[1]
+        hr = session.heart_rate
+        assert hr == None
+
+    def test_validate_third_session(self, sessions_from_polar):
+        session = sessions_from_polar[2]
+        hr = session.heart_rate
         assert hr == TimeSeries(
             values=[91, 92, 93],
             time=[

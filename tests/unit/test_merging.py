@@ -45,7 +45,7 @@ def test_add_sets_from_sessions():
 
 
 class TestPolarIntensityMerge:
-    def test_merge_two_polar_two_intensity(self):
+    def test_merge_when_some_are_merged_and_some_arent(self):
         polar_imports = [
             WorkoutSession(
                 id="polar1",
@@ -58,6 +58,14 @@ class TestPolarIntensityMerge:
                 id="polar2",
                 start_time=datetime(2020, 1, 2, 17, 0, 0, 0),
                 stop_time=datetime(2020, 1, 2, 18, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
+            ),
+            WorkoutSession(
+                id="polar3",
+                type=SessionType(name="Gymnastics"),
+                start_time=datetime(2020, 1, 3, 17, 0, 0, 0),
+                stop_time=datetime(2020, 1, 3, 18, 0, 0, 0),
                 heart_rate=create_timeseries_entry(),
                 origin=["polar"],
             ),
@@ -102,6 +110,14 @@ class TestPolarIntensityMerge:
                 sets=[WorkoutSet()],
                 start_time=datetime(2020, 1, 3),
                 origin=["intensity"],
+            ),
+            WorkoutSession(
+                id="polar3",
+                type=SessionType(name="Gymnastics"),
+                start_time=datetime(2020, 1, 3, 17, 0, 0, 0),
+                stop_time=datetime(2020, 1, 3, 18, 0, 0, 0),
+                heart_rate=create_timeseries_entry(),
+                origin=["polar"],
             ),
         ]
 
