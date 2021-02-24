@@ -86,18 +86,9 @@ def load_all_sessions_in_folder(path: Path) -> List[WorkoutSession]:
     return results
 
 
-import pprint
 
-pp = pprint.PrettyPrinter(indent=4)
-
-# TODO remove error printing when importing all data works
 def load_all_sessions_from_dicts(data: List[Dict]) -> List[WorkoutSession]:
     results = []
     for session_data in data:
-        try:
-            results.append(_convert_to_workout_session(session_data))
-        except Exception as e:
-            print("Error for data:")
-            pp.pprint(session_data)
-            raise e
+        results.append(_convert_to_workout_session(session_data))
     return results
