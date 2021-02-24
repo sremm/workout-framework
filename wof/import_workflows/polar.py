@@ -5,6 +5,7 @@ from typing import Dict, List, Optional
 
 import numpy as np
 from wof.domain.model import SessionType, TimeSeries, WorkoutSession
+from tqdm import tqdm
 
 
 class PolarFormatError(Exception):
@@ -47,6 +48,7 @@ def _convert_to_workout_session(data: Dict) -> WorkoutSession:
             return "Strength training"
         else:
             return name
+
     def _get_name(data) -> str:
         if "name" in data.keys():
             return data["name"]
@@ -65,7 +67,6 @@ def _convert_to_workout_session(data: Dict) -> WorkoutSession:
     else:
         heart_rate = None
 
-
     return WorkoutSession(
         type=SessionType(name=_get_name(data)),
         start_time=start_time,
@@ -76,7 +77,8 @@ def _convert_to_workout_session(data: Dict) -> WorkoutSession:
 
 def load_all_sessions_in_folder(path: Path) -> List[WorkoutSession]:
     results = []
-    for session_file_path in path.glob("training-session*.json"):
+    session_file_paths = list(path.glob("training-session*.json"))
+    for session_file_path in tqdm(session_file_paths):
         with session_file_path.open("r") as f:
             data = json.load(f)
         results.append(_convert_to_workout_session(data))
