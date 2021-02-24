@@ -23,13 +23,16 @@ def _polar_date_conversion(date: str) -> datetime:
 
 
 def _convert_polar_samples(data: List[Dict], unit: str) -> Optional[TimeSeries]:
+    def _get_value(sample):
+        if "value" not in sample.keys():
+            return np.nan
+        else:
+            return sample["value"]
+
     values = []
     time = []
     for sample in data:
-        if "value" not in sample.keys():
-            values.append(np.nan)
-        else:
-            values.append(sample["value"])
+        values.append(_get_value(sample))
         time.append(_polar_date_conversion(sample["dateTime"]))
     if np.all(np.isnan(values)):
         return None
@@ -68,8 +71,18 @@ def load_all_sessions_in_folder(path: Path) -> List[WorkoutSession]:
     return results
 
 
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
+
+# TODO remove error printing when importing all data works
 def load_all_sessions_from_dicts(data: List[Dict]) -> List[WorkoutSession]:
     results = []
     for session_data in data:
-        results.append(_convert_to_workout_session(session_data))
+        try:
+            results.append(_convert_to_workout_session(session_data))
+        except Exception as e:
+            print("Error for data:")
+            pp.pprint(session_data)
+            raise e
     return results
