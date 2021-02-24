@@ -41,6 +41,18 @@ def _convert_polar_samples(data: List[Dict], unit: str) -> Optional[TimeSeries]:
 
 
 def _convert_to_workout_session(data: Dict) -> WorkoutSession:
+    def _get_name_from_excercise(excercise_data) -> str:
+        name = data["exercises"][0]["sport"]
+        if name == "STRENGTH_TRAINING":
+            return "Strength training"
+        else:
+            return name
+    def _get_name(data) -> str:
+        if "name" in data.keys():
+            return data["name"]
+        else:
+            return _get_name_from_excercise(data)
+
     _confirm_export_format(data)
 
     start_time = _polar_date_conversion(data["startTime"])
@@ -53,8 +65,9 @@ def _convert_to_workout_session(data: Dict) -> WorkoutSession:
     else:
         heart_rate = None
 
+
     return WorkoutSession(
-        type=SessionType(name=data["name"]),
+        type=SessionType(name=_get_name(data)),
         start_time=start_time,
         heart_rate=heart_rate,
         origin=["polar"],
