@@ -7,12 +7,14 @@ from wof.service_layer import unit_of_work
 
 def import_polar_data(command: commands.ImportSessionsFromPolarData, uow: unit_of_work.AbstractUnitOfWork):
     workout_sessions = polar.load_all_sessions_from_dicts(command.data)
-    return add_workout_sessions(workout_sessions, uow)
+    add_command = commands.AddSessions(sessions=workout_sessions)
+    return add_workout_sessions(add_command, uow)
 
 
 def import_intensity_data(command: commands.ImportSessionsFromIntensityData, uow: unit_of_work.AbstractUnitOfWork):
     workout_sessions = intensity_app.import_from_file(command.data)
-    return add_workout_sessions(workout_sessions, uow)
+    add_command = commands.AddSessions(sessions=workout_sessions)
+    return add_workout_sessions(add_command, uow)
 
 
 def merge_and_import_data(
@@ -21,7 +23,8 @@ def merge_and_import_data(
     polar_sessions = polar.load_all_sessions_from_dicts(command.polar_data)
     intensity_sessions = intensity_app.import_from_file(command.intensity_data)
     merged_sessions = data_merging.merge_polar_and_instensity_imports(polar_sessions, intensity_sessions)
-    return add_workout_sessions(merged_sessions, uow)
+    add_command = commands.AddSessions(sessions=merged_sessions)
+    return add_workout_sessions(add_command, uow)
 
 
 def add_workout_sessions(command: commands.AddSessions, uow: unit_of_work.AbstractUnitOfWork) -> List:
