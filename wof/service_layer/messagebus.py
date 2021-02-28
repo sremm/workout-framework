@@ -16,6 +16,9 @@ EVENT_HANDLERS: Dict[events.Event, List[Handler]] = {
 COMMAND_HANDLERS: Dict[events.Event, Handler] = {
     commands.AddSessions: handlers.add_workout_sessions,
     commands.AddSetsToSession: handlers.add_sets_to_workout_session,
+    commands.ImportSessionsFromIntensityData: handlers.import_intensity_data,
+    commands.ImportSessionsFromPolarData: handlers.import_polar_data,
+    commands.ImportSessionsFromMergedPolarAndIntensityData: handlers.merge_and_import_data,
     commands.GetSessions: views.workout_sessions,
 }  # type: ignore
 

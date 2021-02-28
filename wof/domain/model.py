@@ -5,7 +5,7 @@ Series x Sets x Reps of Excercies
 """
 from datetime import datetime
 from functools import total_ordering
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 from uuid import uuid4
 
 from bson.objectid import ObjectId
@@ -34,7 +34,9 @@ class WorkoutSet(BaseModel):
     reps: Union[int, List[int]] = 0
     weights: Union[float, List[float]] = 0
     unit: str = "kg"
-    set_number: int = 1  # used in Intensity app as "Set" # would be nice to instead have start time and length later but optional
+    set_number: int = (
+        1  # used in Intensity app as "Set" # would be nice to instead have start time and length later but optional
+    )
     # order of sets could be inferred if we have start times, but for imported data we probably don't
 
     @property

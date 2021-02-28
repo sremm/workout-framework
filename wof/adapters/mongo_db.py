@@ -1,10 +1,11 @@
 """ Stuff for handling MongoDB specifics"""
 
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 
 from bson.objectid import ObjectId
-from config import MongoSettings
 from pymongo import MongoClient
+
+from config import MongoSettings
 from wof.domain.model import WorkoutSession, WorkoutSet
 
 
@@ -17,12 +18,8 @@ def mongo_session_factory(mongo_settings: MongoSettings):
 
 class MongoSession:
     def __init__(self, mongo_settings: Optional[MongoSettings] = None) -> None:
-        self._mongo_settings = (
-            MongoSettings() if mongo_settings is None else mongo_settings
-        )
-        self._client = MongoClient(
-            self._mongo_settings.mongo_host, self._mongo_settings.mongo_port
-        )
+        self._mongo_settings = MongoSettings() if mongo_settings is None else mongo_settings
+        self._client = MongoClient(self._mongo_settings.mongo_host, self._mongo_settings.mongo_port)
         # start session and transaction
         self._uncommited: Dict[str, Dict] = {}
         self._uncommited_updates: Dict = {}

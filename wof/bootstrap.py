@@ -1,8 +1,8 @@
+import functools
 from typing import Callable, List
 
-from wof.service_layer.messagebus import Message, handle
 from wof.service_layer import unit_of_work
-import functools
+from wof.service_layer.messagebus import Message, handle
 
 HandleComposed = Callable[[Message], List]
 

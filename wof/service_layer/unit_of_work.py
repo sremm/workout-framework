@@ -1,11 +1,8 @@
 import abc
-from typing import Callable, Any
-from wof.adapters.mongo_db import MongoSession
+from typing import Any, Callable
 
-from wof.adapters.repository import (
-    BaseWorkoutSessionRepository,
-    MongoDBWorkoutSessionRepository,
-)
+from wof.adapters.mongo_db import MongoSession
+from wof.adapters.repository import BaseWorkoutSessionRepository, MongoDBWorkoutSessionRepository
 
 
 class AbstractUnitOfWork(abc.ABC):

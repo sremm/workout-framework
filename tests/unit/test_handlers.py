@@ -1,3 +1,4 @@
+from io import BytesIO
 from typing import List
 
 import pytest
@@ -70,3 +71,68 @@ def test_add_set_to_existing_session_and_list_all_session(fake_bus_handle):
     added_sets = result[0]
 
     assert len(added_sets) == 2
+
+
+def test_polar_import(fake_bus_handle):
+    command = commands.ImportSessionsFromPolarData(
+        data=[
+            {
+                "duration": "PT6120S",
+                "exercises": [
+                    {
+                        "duration": "PT6120S",
+                        "samples": {},
+                        "sport": "GYMNASTICK",
+                        "startTime": "2019-12-28T14:05:00.000",
+                        "stopTime": "2019-12-28T15:47:00.000",
+                        "zones": {},
+                    }
+                ],
+                "exportVersion": "1.3",
+                "startTime": "2019-12-28T14:05:00.000",
+                "stopTime": "2019-12-28T15:47:00.000",
+            }
+        ]
+    )
+    results = fake_bus_handle(command)
+    added_ids = results[0]
+    assert len(added_ids) == 1
+
+
+def test_intensity_import(fake_bus_handle):
+    data = BytesIO(
+        b"""Date,Exercise,"Exercise ID",Reps,Set,Weight,RPE,Percentage,"Set Type",Rest,Unit,Distance,"Distance Unit",Time,Completed,Notes\n2020-11-12,"Single leg romanian deadlifts",4605,12,2,50,8,70,,,kg,,m,,1,"""
+    )
+    command = commands.ImportSessionsFromIntensityData(data=data)
+    results = fake_bus_handle(command)
+    added_ids = results[0]
+    assert len(added_ids) == 1
+
+
+def test_polar_intensity_merge_import(fake_bus_handle):
+    command = commands.ImportSessionsFromMergedPolarAndIntensityData(
+        polar_data=[
+            {
+                "duration": "PT6120S",
+                "exercises": [
+                    {
+                        "duration": "PT6120S",
+                        "samples": {},
+                        "sport": "GYMNASTICK",
+                        "startTime": "2019-12-28T14:05:00.000",
+                        "stopTime": "2019-12-28T15:47:00.000",
+                        "zones": {},
+                    }
+                ],
+                "exportVersion": "1.3",
+                "startTime": "2019-12-28T14:05:00.000",
+                "stopTime": "2019-12-28T15:47:00.000",
+            }
+        ],
+        intensity_data=BytesIO(
+            b"""Date,Exercise,"Exercise ID",Reps,Set,Weight,RPE,Percentage,"Set Type",Rest,Unit,Distance,"Distance Unit",Time,Completed,Notes\n2020-11-12,"Single leg romanian deadlifts",4605,12,2,50,8,70,,,kg,,m,,1,"""
+        ),
+    )
+    results = fake_bus_handle(command)
+    added_ids = results[0]
+    assert len(added_ids) == 2

@@ -1,12 +1,10 @@
-from typing import DefaultDict, List, Dict
+from typing import DefaultDict, Dict, List
 
-from wof.service_layer.unit_of_work import AbstractUnitOfWork
 from wof.domain import commands
+from wof.service_layer.unit_of_work import AbstractUnitOfWork
 
 
-def workout_sessions(
-    command: commands.GetSessions, uow: AbstractUnitOfWork
-) -> List[Dict]:
+def workout_sessions(command: commands.GetSessions, uow: AbstractUnitOfWork) -> List[Dict]:
     def _get_query_args():
         result = DefaultDict(dict)
         if command.date_range.start is not None:

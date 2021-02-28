@@ -1,7 +1,8 @@
-from typing import List, Optional
+from io import BytesIO
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
-from wof.domain.model import WorkoutSession, WorkoutSet, DateTimeRange
+from wof.domain.model import DateTimeRange, WorkoutSession, WorkoutSet
 
 
 class Command(BaseModel):
@@ -25,5 +26,20 @@ class GetSessions(Command):
     date_range: Optional[DateTimeRange]
 
 
-class ImportData(Command):
-    pass
+class ImportSessionsFromIntensityData(Command):
+    data: BytesIO
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class ImportSessionsFromPolarData(Command):
+    data: List[Dict]
+
+
+class ImportSessionsFromMergedPolarAndIntensityData(Command):
+    polar_data: List[Dict]
+    intensity_data: BytesIO
+
+    class Config:
+        arbitrary_types_allowed = True
