@@ -87,6 +87,7 @@ async def in_datetime_range(
 @app.post("/import/intensity", tags=["workout_sessions"])
 def from_csv_file(file: UploadFile = File(...)):
     workout_sessions = intensity_app.import_from_file(file.file._file)
+    # commands.ImportSessionsFromIntensityData ... load_sess
     results = handle_composed(commands.AddSessions(sessions=workout_sessions))
     added_session_ids = results.pop(0)
     return {"number_of_sessions": len(added_session_ids)}
@@ -97,6 +98,7 @@ def from_json_files(files: List[UploadFile] = File(...)):
     workout_sessions = polar.load_all_sessions_from_dicts(
         [json.load(x.file) for x in files]
     )
+    # commands.ImportSessionsFromPolarData ... load_sess
     results = handle_composed(commands.AddSessions(sessions=workout_sessions))
     added_session_ids = results.pop(0)
     return {"number_of_sessions": len(added_session_ids)}
@@ -113,6 +115,7 @@ def from_json_and_csv_files(
     merged_sessions = data_merging.merge_polar_and_instensity_imports(
         polar_sessions=polar_sessions, intensity_sessions=intensity_sessions
     )
+    # commands.ImportSessionsFromMergedPolarAndIntensityData 
     results = handle_composed(commands.AddSessions(sessions=merged_sessions))
     added_session_ids = results.pop(0)
     return {"number_of_sessions": len(added_session_ids)}
