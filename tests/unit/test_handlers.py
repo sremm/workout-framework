@@ -70,3 +70,37 @@ def test_add_set_to_existing_session_and_list_all_session(fake_bus_handle):
     added_sets = result[0]
 
     assert len(added_sets) == 2
+
+
+def test_polar_import(fake_bus_handle):
+    command = commands.ImportSessionsFromPolarData(
+        data=[
+            {
+                "duration": "PT6120S",
+                "exercises": [
+                    {
+                        "duration": "PT6120S",
+                        "samples": {},
+                        "sport": "GYMNASTICK",
+                        "startTime": "2019-12-28T14:05:00.000",
+                        "stopTime": "2019-12-28T15:47:00.000",
+                        "zones": {},
+                    }
+                ],
+                "exportVersion": "1.3",
+                "startTime": "2019-12-28T14:05:00.000",
+                "stopTime": "2019-12-28T15:47:00.000",
+            }
+        ]
+    )
+    results = fake_bus_handle(command)
+    added_ids = results[0]
+    assert len(added_ids) == 1
+
+
+def test_intensity_import(fake_bus_handle):
+    assert 0
+
+
+def test_polar_intensity_merge_import(fake_bus_handle):
+    assert 0
