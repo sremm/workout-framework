@@ -110,4 +110,29 @@ def test_intensity_import(fake_bus_handle):
 
 
 def test_polar_intensity_merge_import(fake_bus_handle):
-    assert 0
+    command = commands.ImportSessionsFromMergedPolarAndIntensityData(
+        polar_data=[
+            {
+                "duration": "PT6120S",
+                "exercises": [
+                    {
+                        "duration": "PT6120S",
+                        "samples": {},
+                        "sport": "GYMNASTICK",
+                        "startTime": "2019-12-28T14:05:00.000",
+                        "stopTime": "2019-12-28T15:47:00.000",
+                        "zones": {},
+                    }
+                ],
+                "exportVersion": "1.3",
+                "startTime": "2019-12-28T14:05:00.000",
+                "stopTime": "2019-12-28T15:47:00.000",
+            }
+        ],
+        intensity_data=BytesIO(
+            b"""Date,Exercise,"Exercise ID",Reps,Set,Weight,RPE,Percentage,"Set Type",Rest,Unit,Distance,"Distance Unit",Time,Completed,Notes\n2020-11-12,"Single leg romanian deadlifts",4605,12,2,50,8,70,,,kg,,m,,1,"""
+        ),
+    )
+    results = fake_bus_handle(command)
+    added_ids = results[0]
+    assert len(added_ids) == 2
