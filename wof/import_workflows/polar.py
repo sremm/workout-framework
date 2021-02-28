@@ -4,8 +4,9 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import numpy as np
-from wof.domain.model import SessionType, TimeSeries, WorkoutSession
 from tqdm import tqdm
+
+from wof.domain.model import SessionType, TimeSeries, WorkoutSession
 
 
 class PolarFormatError(Exception):
@@ -14,9 +15,7 @@ class PolarFormatError(Exception):
 
 def _confirm_export_format(data):
     if len(data["exercises"]) != 1:
-        raise PolarFormatError(
-            f"Expecting 1 entry in exercises, but got {len(data['exercises'])}"
-        )
+        raise PolarFormatError(f"Expecting 1 entry in exercises, but got {len(data['exercises'])}")
 
 
 def _polar_date_conversion(date: str) -> datetime:
@@ -61,9 +60,7 @@ def _convert_to_workout_session(data: Dict) -> WorkoutSession:
 
     first_excerise_samples = data["exercises"][0]["samples"]
     if "heartRate" in first_excerise_samples.keys():
-        heart_rate = _convert_polar_samples(
-            first_excerise_samples["heartRate"], unit="bpm"
-        )
+        heart_rate = _convert_polar_samples(first_excerise_samples["heartRate"], unit="bpm")
     else:
         heart_rate = None
 
@@ -84,7 +81,6 @@ def load_all_sessions_in_folder(path: Path) -> List[WorkoutSession]:
         results.append(_convert_to_workout_session(data))
     results.sort()
     return results
-
 
 
 def load_all_sessions_from_dicts(data: List[Dict]) -> List[WorkoutSession]:

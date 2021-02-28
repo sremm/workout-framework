@@ -2,6 +2,7 @@ from typing import List, Tuple
 
 import numpy as np
 from pydantic import BaseModel
+
 from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
 
 
@@ -17,9 +18,7 @@ class WorkoutSetStats(BaseModel):
             if workout_set.has_subsets:
                 return WorkoutSetStats(
                     total_reps=np.sum(workout_set.reps),
-                    total_weight=np.sum(
-                        np.array(workout_set.weights) * np.array(workout_set.reps)
-                    ),
+                    total_weight=np.sum(np.array(workout_set.weights) * np.array(workout_set.reps)),
                     exercises=tuple(sorted(set(workout_set.exercise))),
                 )
             else:
@@ -83,17 +82,13 @@ class WorkoutSessionsSummary(BaseModel):
 
 def compute_time_series_stats(data: List[TimeSeries]) -> TimeSeriesStats:
     stats_mean = np.mean([TimeSeriesStats.compute(x).values for x in data], axis=0)
-    return TimeSeriesStats(
-        mean=stats_mean[0], min=stats_mean[1], max=stats_mean[2], std=stats_mean[3]
-    )
+    return TimeSeriesStats(mean=stats_mean[0], min=stats_mean[1], max=stats_mean[2], std=stats_mean[3])
 
 
 def compute_merged_set_stats(
     sessions: List[WorkoutSession],
 ) -> WorkoutSetStats:
-    stats: List[WorkoutSetStats] = [
-        WorkoutSetStats.compute(session.sets) for session in sessions
-    ]  # type: ignore
+    stats: List[WorkoutSetStats] = [WorkoutSetStats.compute(session.sets) for session in sessions]  # type: ignore
     result: WorkoutSetStats = sum(stats, start=WorkoutSetStats.empty_stats())  # type: ignore
     return result
 
@@ -104,7 +99,5 @@ def compute_workout_sessions_summary(
     return WorkoutSessionsSummary(
         session_ids=[x.id for x in sessions],
         workout_set_stats=compute_merged_set_stats(sessions),
-        heart_rate_stats=compute_time_series_stats(
-            [x.heart_rate for x in sessions if x.heart_rate is not None]
-        ),
+        heart_rate_stats=compute_time_series_stats([x.heart_rate for x in sessions if x.heart_rate is not None]),
     )

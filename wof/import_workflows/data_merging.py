@@ -1,15 +1,13 @@
+import copy
 from datetime import datetime
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
 
 from pydantic import BaseModel
+
 from wof.domain.model import WorkoutSession
 
-import copy
 
-
-def add_sets_from_sessions(
-    base_session: WorkoutSession, sessions_with_sets: List[WorkoutSession]
-) -> WorkoutSession:
+def add_sets_from_sessions(base_session: WorkoutSession, sessions_with_sets: List[WorkoutSession]) -> WorkoutSession:
     result = base_session
     for session in sessions_with_sets:
         result.add_sets(session.sets, origin=session.origin)
@@ -48,9 +46,7 @@ def merge_polar_and_instensity_imports(
     ) -> Dict[datetime, WorkoutSession]:
         return {x.start_time: x for x in sessions}
 
-    def _match_datetime_days(
-        polar_times: List[datetime], intensity_times: List[datetime]
-    ) -> PotentialMatchingResult:
+    def _match_datetime_days(polar_times: List[datetime], intensity_times: List[datetime]) -> PotentialMatchingResult:
         """ Datetime based matching """
         matched_start_times = []
         unmatched_polar = []
@@ -64,11 +60,7 @@ def merge_polar_and_instensity_imports(
                     current_matches.append(polar_time)
                     matched_polar.add(polar_time)
             if current_matches != []:
-                matched_start_times.append(
-                    PotentialDatetimeMatches(
-                        intensity=intensity_time, polar=current_matches
-                    )
-                )
+                matched_start_times.append(PotentialDatetimeMatches(intensity=intensity_time, polar=current_matches))
             else:
                 unmatched_intensity.append(intensity_time)
         # add all polar_times without match to result list
@@ -105,9 +97,7 @@ def merge_polar_and_instensity_imports(
                 final_matches.append((int_session.start_time, first_polar_match))
             else:
                 unmatched_intensity.append(int_session.start_time)
-            unmatched_polar.extend(
-                sorted_polar_matches
-            )  # all that is left is unmatched
+            unmatched_polar.extend(sorted_polar_matches)  # all that is left is unmatched
 
         return FinalMatchingResult(
             matches=final_matches,
@@ -117,9 +107,7 @@ def merge_polar_and_instensity_imports(
 
     polar: Dict = _get_start_time_to_session_mapping(polar_sessions)
     intensity: Dict = _get_start_time_to_session_mapping(intensity_sessions)
-    potential_matching = _match_datetime_days(
-        list(polar.keys()), list(intensity.keys())
-    )
+    potential_matching = _match_datetime_days(list(polar.keys()), list(intensity.keys()))
     final_matching = _match_session_type(potential_matching, polar, intensity)
     results = []
     for intensity_time, polar_time in final_matching.matches:

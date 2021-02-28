@@ -4,7 +4,8 @@ from tempfile import SpooledTemporaryFile
 from typing import Dict, List, Union
 
 import pandas as pd
-from wof.domain.model import WorkoutSession, WorkoutSet, SessionType
+
+from wof.domain.model import SessionType, WorkoutSession, WorkoutSet
 
 
 def import_from_file(input: Union[SpooledTemporaryFile, Path]) -> List[WorkoutSession]:

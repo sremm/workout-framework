@@ -1,17 +1,15 @@
+import ptvsd
 import requests
 import streamlit as st
-import config
 
-import ptvsd
+import config
 
 ptvsd.enable_attach(address=("localhost", 5678))
 # ptvsd.wait_for_attach()  # Only include this line if you always wan't to attach the debugger
 
 st.title("Data Importer")
 # define format selector
-export_format = st.selectbox(
-    "Export format", options=["Polar", "Intensity", "PolarAndIntensity"]
-)
+export_format = st.selectbox("Export format", options=["Polar", "Intensity", "PolarAndIntensity"])
 # define uploader
 if export_format == "Intensity":
     uploader_text = "Select your Intensity export csv file"
@@ -52,9 +50,7 @@ if st.button("Upload"):
             # all json files as polar_files
             polar_files = [("polar_files", x) for x in uploaded if ".json" in x.name]
             # the csv file as intensity_file
-            intensity_files = [
-                ("intensity_file", x) for x in uploaded if ".csv" in x.name
-            ]
+            intensity_files = [("intensity_file", x) for x in uploaded if ".csv" in x.name]
             assert len(polar_files) >= 1, "No polar files .json found"
             assert len(intensity_files) == 1, "Found more than 1 or 0 intensity files"
             files = [*polar_files, *intensity_files]
