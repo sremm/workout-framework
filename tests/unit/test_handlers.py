@@ -1,3 +1,4 @@
+from io import BytesIO
 from typing import List
 
 import pytest
@@ -99,7 +100,13 @@ def test_polar_import(fake_bus_handle):
 
 
 def test_intensity_import(fake_bus_handle):
-    assert 0
+    data = BytesIO(
+        b"""Date,Exercise,"Exercise ID",Reps,Set,Weight,RPE,Percentage,"Set Type",Rest,Unit,Distance,"Distance Unit",Time,Completed,Notes\n2020-11-12,"Single leg romanian deadlifts",4605,12,2,50,8,70,,,kg,,m,,1,"""
+    )
+    command = commands.ImportSessionsFromIntensityData(data=data)
+    results = fake_bus_handle(command)
+    added_ids = results[0]
+    assert len(added_ids) == 1
 
 
 def test_polar_intensity_merge_import(fake_bus_handle):
