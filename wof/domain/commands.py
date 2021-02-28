@@ -1,8 +1,7 @@
-from tempfile import SpooledTemporaryFile
-from typing import Dict, List, Optional
+from io import BytesIO
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
-
 from wof.domain.model import DateTimeRange, WorkoutSession, WorkoutSet
 
 
@@ -28,7 +27,10 @@ class GetSessions(Command):
 
 
 class ImportSessionsFromIntensityData(Command):
-    data: SpooledTemporaryFile
+    data: BytesIO
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class ImportSessionsFromPolarData(Command):
@@ -37,4 +39,7 @@ class ImportSessionsFromPolarData(Command):
 
 class ImportSessionsFromMergedPolarAndIntensityData(Command):
     polar_data: List[Dict]
-    intensity_data: SpooledTemporaryFile
+    intensity_data: BytesIO
+
+    class Config:
+        arbitrary_types_allowed = True
