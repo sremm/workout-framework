@@ -1,16 +1,27 @@
 from typing import List
 
 from wof.domain import commands
+from wof.import_workflows import data_merging, intensity_app, polar
 from wof.service_layer import unit_of_work
 
 
-def import_sessions(command: commands.ImportData, uow: unit_of_work.AbstractUnitOfWork):
-    def _convert(command: commands.ImportData) -> commands.AddSessions:
-        return commands.AddSessions(sessions=[])
+def import_polar_data(command: commands.ImportSessionsFromPolarData, uow: unit_of_work.AbstractUnitOfWork):
+    workout_sessions = polar.load_all_sessions_from_dicts(command.data)
+    return add_workout_sessions(workout_sessions, uow)
 
-    # convert to sessions
-    sessions_to_add = _convert(command)
-    add_workout_sessions(sessions_to_add, uow)
+
+def import_intensity_data(command: commands.ImportSessionsFromIntensityData, uow: unit_of_work.AbstractUnitOfWork):
+    workout_sessions = intensity_app.import_from_file(command.data)
+    return add_workout_sessions(workout_sessions, uow)
+
+
+def merge_and_import_data(
+    command: commands.ImportSessionsFromMergedPolarAndIntensityData, uow: unit_of_work.AbstractUnitOfWork
+):
+    polar_sessions = polar.load_all_sessions_from_dicts(command.polar_data)
+    intensity_sessions = intensity_app.import_from_file(command.intensity_data)
+    merged_sessions = data_merging.merge_polar_and_instensity_imports(polar_sessions, intensity_sessions)
+    return add_workout_sessions(merged_sessions, uow)
 
 
 def add_workout_sessions(command: commands.AddSessions, uow: unit_of_work.AbstractUnitOfWork) -> List:
