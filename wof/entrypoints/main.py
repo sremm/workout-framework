@@ -10,9 +10,9 @@ import uvicorn
 from fastapi import FastAPI, File, UploadFile
 from wof.adapters.mongo_db import mongo_session_factory
 from wof.bootstrap import bootstrap_handle
-from wof.domain import commands, events, views
+from wof.domain import commands, events
+from wof.domain.analytics import WorkoutSessionsSummary
 from wof.domain.model import DateTimeRange, WorkoutSession, WorkoutSet
-from wof.import_workflows import data_merging, intensity_app, polar
 from wof.service_layer import messagebus, unit_of_work
 
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
@@ -72,6 +72,16 @@ async def in_datetime_range(
     results = handle_composed(commands.GetSessions(date_range=DateTimeRange(start=start, end=end)))
     fetched_sessions = results.pop(0)
     return fetched_sessions
+
+
+@app.get("analytics/workout_session_summary", response_model=WorkoutSessionsSummary, tags=["workout_sessions"])
+def for_data_in_datetime_range(
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
+):
+    results = handle_composed(commands.GetWorkoutSessionSummary(date_range=DateTimeRange(start=start, end=end)))
+    fetched_summary = results.pop(0)
+    return fetched_summary
 
 
 @app.post("/import/intensity", tags=["workout_sessions"])

@@ -26,6 +26,10 @@ class GetSessions(Command):
     date_range: Optional[DateTimeRange]
 
 
+class GetWorkoutSessionSummary(Command):
+    date_range: DateTimeRange
+
+
 class ImportSessionsFromIntensityData(Command):
     data: BytesIO
 
