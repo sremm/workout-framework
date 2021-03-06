@@ -74,7 +74,7 @@ async def in_datetime_range(
     return fetched_sessions
 
 
-@app.get("analytics/workout_session_summary", response_model=WorkoutSessionsSummary, tags=["workout_sessions"])
+@app.get("/analytics/workout_session_summary", response_model=WorkoutSessionsSummary, tags=["workout_sessions"])
 def for_data_in_datetime_range(
     start: Optional[datetime] = None,
     end: Optional[datetime] = None,
