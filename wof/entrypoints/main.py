@@ -3,11 +3,13 @@
 import json
 import logging
 from datetime import datetime
-from typing import Callable, List, Optional
+from typing import Any, Callable, List, Optional
 
 import config
+import orjson
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
 from wof.adapters.mongo_db import mongo_session_factory
 from wof.bootstrap import bootstrap_handle
 from wof.domain import commands, events
@@ -18,7 +20,19 @@ from wof.service_layer import messagebus, unit_of_work
 logging.basicConfig(format="%(asctime)s-%(levelname)s-%(message)s", level=logging.INFO)
 
 
-app = FastAPI()
+class ORJSONResponse(JSONResponse):
+    """ custom response to handle nans, cudos to https://github.com/tiangolo/fastapi/issues/459#issuecomment-536781105"""
+
+    media_type = "application/json"
+
+    def render(self, content: Any) -> bytes:
+        return orjson.dumps(
+            content,
+            option=orjson.OPT_SERIALIZE_NUMPY,
+        )
+
+
+app = FastAPI(default_response_class=ORJSONResponse)
 
 
 class Handle:
