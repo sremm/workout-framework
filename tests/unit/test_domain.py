@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 
+import numpy as np
 from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
 
 
@@ -31,3 +32,11 @@ class TestWorkoutSession:
         sets = [WorkoutSet(), WorkoutSet()]
         session.add_sets(sets)
         assert len(session) == 2
+
+
+class TestTimeSeries:
+    def test_pre_validator(self):
+        time_series = TimeSeries(
+            values=[1, None, 2, None, 3, None], time=[datetime.now() for _ in range(6)], unit="bpm"
+        )
+        assert np.allclose(time_series.values, [1, np.nan, 2, np.nan, 3, np.nan], equal_nan=True)

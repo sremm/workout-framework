@@ -8,8 +8,9 @@ from functools import total_ordering
 from typing import List, Optional, Union
 from uuid import uuid4
 
+import numpy as np
 from bson.objectid import ObjectId
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class DateTimeRange(BaseModel):
@@ -56,6 +57,12 @@ class TimeSeries(BaseModel):
     values: List[Union[int, float]]
     time: List[datetime]
     unit: str
+
+    @validator("values", pre=True)
+    def none_to_nan(cls, v):
+        if None in v:
+            return list(np.array(v, dtype=float))
+        return v
 
 
 def uuid4_as_str(*args) -> str:
