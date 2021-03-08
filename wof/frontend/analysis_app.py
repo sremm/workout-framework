@@ -1,5 +1,7 @@
+import enum
+from collections import defaultdict
 from datetime import date, datetime
-from typing import Dict, List, Optional
+from typing import DefaultDict, Dict, List, Optional
 
 import config
 import plotly.graph_objects as go
@@ -68,6 +70,7 @@ summary_view(summary_data)
 st.header("Last session in period")
 
 
+@st.cache
 def get_sessions_in_range(start_date, end_date) -> List[model.WorkoutSession]:
     res = requests.get(f"{config.get_api_url()}/workout_sessions", params=(("start", start_date), ("end", end_date)))
     return [model.WorkoutSession(**x) for x in res.json()]
@@ -79,21 +82,23 @@ sessions_in_range = get_sessions_in_range(start_date, end_date)
 def session_view(data: model.WorkoutSession):
     st.write("Date: ", data.start_time, "Session type: ", data.type.name)
 
-    # do some nice table to get an overview of excercises
-    # Excercise - Squats        - Deadlift
-    #             10 reps 10 kg   8 reps 20 kg
-    #             10 reps 10 kg   8 reps 20 kg
+    if data.sets != []:
+        st.subheader("Exercises")
+        per_exercise: DefaultDict[str, List] = defaultdict(list)
+        for cur_set in data.sets:
+            per_exercise[cur_set.exercise].append(cur_set)
+        cols = st.beta_columns(len(per_exercise))
+        for idx, (key, vals) in enumerate(per_exercise.items()):
+            cols[idx].text(key)
+            for cur_set in vals:
+                cols[idx].write(f"{cur_set.reps} x {cur_set.weights} {cur_set.unit}")
 
-    # gather sets per excercise
-    # create a column for each exercise
-    for cur_set in data.sets:
-        st.write(cur_set)
-
-    # plot hr
     if data.heart_rate is not None:
+        st.subheader("Heart rate")
         fig = go.Figure()
         fig.add_scatter(x=data.heart_rate.time, y=data.heart_rate.values)
-        st.write(fig)
+        st.plotly_chart(fig)
 
 
-session_view(sessions_in_range[-1])
+selected_session_idx = st.selectbox("Select session", options=[x for x in range(len(sessions_in_range))], index=0)
+session_view(sessions_in_range[selected_session_idx])
