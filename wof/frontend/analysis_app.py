@@ -1,7 +1,8 @@
 from datetime import date, datetime
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import config
+import plotly.graph_objects as go
 
 # import ptvsd
 import requests
@@ -28,12 +29,10 @@ end_date = convert_to_datetime(col2.date_input("End date"))
 
 @st.cache
 def get_summary_data(start_date, end_date) -> analytics.WorkoutSessionsSummary:
-    print(start_date)
-    print(end_date)
-    print("fetcing data")
+    print("fetching data", start_date, end_date)
     res = requests.get(
         f"{config.get_api_url()}/analytics/workout_session_summary",
-        params=(("start", str(start_date)), ("end", end_date)),
+        params=(("start", start_date), ("end", end_date)),
     )
     return analytics.WorkoutSessionsSummary(**res.json())
 
@@ -66,19 +65,19 @@ def summary_view(data: analytics.WorkoutSessionsSummary):
 
 summary_data = get_summary_data(start_date, end_date)
 summary_view(summary_data)
-st.header("Last Session")
+st.header("Last session in period")
 
 
-def get_last_session(session_type_name: Optional[str] = None) -> model.WorkoutSession:
-    # res = request.get("/workout_session/last_session",params=(("type","Strength Training")))
-    return model.WorkoutSession(type=model.SessionType(name=session_type_name))
+def get_sessions_in_range(start_date, end_date) -> List[model.WorkoutSession]:
+    res = requests.get(f"{config.get_api_url()}/workout_sessions", params=(("start", start_date), ("end", end_date)))
+    return [model.WorkoutSession(**x) for x in res.json()]
 
 
-last_strength_session = get_last_session(session_type_name="Strength training")
+sessions_in_range = get_sessions_in_range(start_date, end_date)
 
 
 def session_view(data: model.WorkoutSession):
-    st.write("Session type: ", data.type.name)
+    st.write("Date: ", data.start_time, "Session type: ", data.type.name)
 
     # do some nice table to get an overview of excercises
     # Excercise - Squats        - Deadlift
@@ -92,7 +91,9 @@ def session_view(data: model.WorkoutSession):
 
     # plot hr
     if data.heart_rate is not None:
-        st.line_chart(last_strength_session)
+        fig = go.Figure()
+        fig.add_scatter(x=data.heart_rate.time, y=data.heart_rate.values)
+        st.write(fig)
 
 
-session_view(last_strength_session)
+session_view(sessions_in_range[-1])
