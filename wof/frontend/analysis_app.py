@@ -1,12 +1,12 @@
 from datetime import date, datetime
-from typing import Dict
+from typing import Dict, Optional
 
 import config
 
 # import ptvsd
 import requests
 import streamlit as st
-from wof.domain import analytics
+from wof.domain import analytics, model
 
 # ptvsd.enable_attach(address=("localhost", 5678))
 # # ptvsd.wait_for_attach()  # Only include this line if you always wan't to attach the debugger
@@ -68,11 +68,31 @@ summary_data = get_summary_data(start_date, end_date)
 summary_view(summary_data)
 st.header("Last Session")
 
-st.header("Current Month")
+
+def get_last_session(session_type_name: Optional[str] = None) -> model.WorkoutSession:
+    # res = request.get("/workout_session/last_session",params=(("type","Strength Training")))
+    return model.WorkoutSession(type=model.SessionType(name=session_type_name))
 
 
-def current_month_view():
-    pass
+last_strength_session = get_last_session(session_type_name="Strength training")
 
 
-st.header("Current Week")
+def session_view(data: model.WorkoutSession):
+    st.write("Session type: ", data.type.name)
+
+    # do some nice table to get an overview of excercises
+    # Excercise - Squats        - Deadlift
+    #             10 reps 10 kg   8 reps 20 kg
+    #             10 reps 10 kg   8 reps 20 kg
+
+    # gather sets per excercise
+    # create a column for each exercise
+    for cur_set in data.sets:
+        st.write(cur_set)
+
+    # plot hr
+    if data.heart_rate is not None:
+        st.line_chart(last_strength_session)
+
+
+session_view(last_strength_session)
