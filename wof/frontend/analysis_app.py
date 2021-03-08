@@ -20,7 +20,7 @@ st.set_page_config(layout="wide")
 st.title("Workout Analysis")
 
 # Date selector
-st.header("Summary")
+st.header("Summary for period")
 col1, col2 = st.beta_columns(2)
 start_date = convert_to_datetime(col1.date_input("Start date"))
 end_date = convert_to_datetime(col2.date_input("End date"))
@@ -47,6 +47,7 @@ def summary_view(data: analytics.WorkoutSessionsSummary):
     ## Totals:
     - Reps: {data.workout_set_stats.total_reps}
     - Weight: {data.workout_set_stats.total_weight} {data.workout_set_stats.weight_unit}
+    - Average per rep: {data.workout_set_stats.total_weight/data.workout_set_stats.total_reps:.1f} kg/rep
     """
     )
 
