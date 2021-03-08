@@ -2,7 +2,6 @@ from typing import List, Tuple
 
 import numpy as np
 from pydantic import BaseModel
-
 from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
 
 
@@ -57,8 +56,8 @@ class TimeSeriesStats(BaseModel):
     def compute(time_series: TimeSeries):
         return TimeSeriesStats(
             mean=np.nanmean(time_series.values),
-            min=min(time_series.values),
-            max=max(time_series.values),
+            min=np.nanmin(time_series.values),
+            max=np.nanmax(time_series.values),
             std=np.nanstd(time_series.values),
         )
 

@@ -19,6 +19,7 @@ COMMAND_HANDLERS: Dict[events.Event, Handler] = {
     commands.ImportSessionsFromIntensityData: handlers.import_intensity_data,
     commands.ImportSessionsFromPolarData: handlers.import_polar_data,
     commands.ImportSessionsFromMergedPolarAndIntensityData: handlers.merge_and_import_data,
+    commands.GetWorkoutSessionSummary: views.workout_sessions_summary,
     commands.GetSessions: views.workout_sessions,
 }  # type: ignore
 
