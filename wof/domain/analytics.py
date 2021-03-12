@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
 import numpy as np
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from wof.domain.model import TimeSeries, WorkoutSession, WorkoutSet
 
 
@@ -51,6 +51,12 @@ class TimeSeriesStats(BaseModel):
     min: float
     max: float
     std: float
+
+    @validator("*", pre=True)
+    def none_to_nan(cls, v):
+        if v is None:
+            return np.nan
+        return v
 
     @staticmethod
     def compute(time_series: TimeSeries):
