@@ -81,7 +81,10 @@ class WorkoutSessionsSummary(BaseModel):
 
 def compute_time_series_stats(data: List[TimeSeries]) -> TimeSeriesStats:
     stats_mean = np.mean([TimeSeriesStats.compute(x).values for x in data], axis=0)
-    return TimeSeriesStats(mean=stats_mean[0], min=stats_mean[1], max=stats_mean[2], std=stats_mean[3])
+    if np.all(np.isnan(stats_mean)):
+        return TimeSeriesStats(mean=np.nan, min=np.nan, max=np.nan, std=np.nan)
+    else:
+        return TimeSeriesStats(mean=stats_mean[0], min=stats_mean[1], max=stats_mean[2], std=stats_mean[3])
 
 
 def compute_merged_set_stats(
