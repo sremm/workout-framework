@@ -43,13 +43,19 @@ def summary_view(data: analytics.WorkoutSessionsSummary):
     col1, col2 = st.beta_columns([1, 1])
     # set stats
 
+    kg_per_rep = (
+        data.workout_set_stats.total_weight / data.workout_set_stats.total_reps
+        if data.workout_set_stats.total_reps != 0
+        else 0
+    )
     col1.markdown(
         f"""
-    ## Totals:
-    - Reps: {data.workout_set_stats.total_reps}
-    - Weight: {data.workout_set_stats.total_weight} {data.workout_set_stats.weight_unit}
-    - Average per rep: {data.workout_set_stats.total_weight/data.workout_set_stats.total_reps:.1f} kg/rep
-    """
+        ## Totals:
+        - Number of sessions: {len(data.session_ids)}
+        - Reps: {data.workout_set_stats.total_reps}
+        - Weight: {data.workout_set_stats.total_weight} {data.workout_set_stats.weight_unit}
+        - Average per rep: {kg_per_rep:.1f} kg/rep
+        """
     )
 
     # hr stats
@@ -70,7 +76,7 @@ summary_view(summary_data)
 st.header("Last session in period")
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def get_sessions_in_range(start_date, end_date) -> List[model.WorkoutSession]:
     res = requests.get(f"{config.get_api_url()}/workout_sessions", params=(("start", start_date), ("end", end_date)))
     return [model.WorkoutSession(**x) for x in res.json()]
@@ -100,5 +106,6 @@ def session_view(data: model.WorkoutSession):
         st.plotly_chart(fig)
 
 
-selected_session_idx = st.selectbox("Select session", options=[x for x in range(len(sessions_in_range))], index=0)
-session_view(sessions_in_range[selected_session_idx])
+if sessions_in_range != []:
+    selected_session_idx = st.selectbox("Select session", options=[x for x in range(len(sessions_in_range))], index=0)
+    session_view(sessions_in_range[selected_session_idx])
