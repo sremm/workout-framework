@@ -5,7 +5,6 @@ from typing import DefaultDict, Dict, List, Optional
 
 import config
 import plotly.graph_objects as go
-
 # import ptvsd
 import requests
 import streamlit as st
@@ -25,8 +24,8 @@ st.title("Workout Analysis")
 # Date selector
 st.header("Summary for period")
 col1, col2 = st.beta_columns(2)
-start_date = convert_to_datetime(col1.date_input("Start date"))
-end_date = convert_to_datetime(col2.date_input("End date"))
+start_date = convert_to_datetime(col1.date_input("Start date", value=date(2021, 1, 1)))
+end_date = convert_to_datetime(col2.date_input("End date", value=date(2021, 1, 31)))
 
 
 @st.cache
@@ -104,6 +103,23 @@ def session_view(data: model.WorkoutSession):
         fig = go.Figure()
         fig.add_scatter(x=data.heart_rate.time, y=data.heart_rate.values)
         st.plotly_chart(fig)
+
+
+def strenght_training_sessions_view(sessions: List[model.WorkoutSession]):
+    """ filters out non strenght training sessions and shows interesting information about the sessions """
+    strength_sessions = [x for x in sessions if x.type.name == "Strength training"]
+    st.write("Strenght training sessions")
+    cols = st.beta_columns(8)
+    # create Week number col
+    total_weeks = 5
+    for week in range(total_weeks):
+        cols[0].write(f"W{week}")
+    
+    for sess in strength_sessions:
+        st.write("Date: ", sess.start_time, "Y,W,D", sess.start_time.isocalendar())
+
+
+strenght_training_sessions_view(sessions_in_range)
 
 
 if sessions_in_range != []:
