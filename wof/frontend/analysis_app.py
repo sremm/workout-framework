@@ -5,6 +5,7 @@ from typing import DefaultDict, Dict, List, Optional
 
 import config
 import plotly.graph_objects as go
+
 # import ptvsd
 import requests
 import streamlit as st
@@ -72,6 +73,7 @@ def summary_view(data: analytics.WorkoutSessionsSummary):
 
 summary_data = get_summary_data(start_date, end_date)
 summary_view(summary_data)
+st.markdown("---")
 st.header("Last session in period")
 
 
@@ -105,6 +107,15 @@ def session_view(data: model.WorkoutSession):
         st.plotly_chart(fig)
 
 
+st.markdown("---")
+
+if sessions_in_range != []:
+    selected_session_idx = st.selectbox("Select session", options=[x for x in range(len(sessions_in_range))], index=0)
+    session_view(sessions_in_range[selected_session_idx])
+
+st.markdown("---")
+
+
 def strenght_training_sessions_view(sessions: List[model.WorkoutSession]):
     """ filters out non strenght training sessions and shows interesting information about the sessions """
     strength_sessions = [x for x in sessions if x.type.name == "Strength training"]
@@ -114,14 +125,9 @@ def strenght_training_sessions_view(sessions: List[model.WorkoutSession]):
     total_weeks = 5
     for week in range(total_weeks):
         cols[0].write(f"W{week}")
-    
+
     for sess in strength_sessions:
         st.write("Date: ", sess.start_time, "Y,W,D", sess.start_time.isocalendar())
 
 
 strenght_training_sessions_view(sessions_in_range)
-
-
-if sessions_in_range != []:
-    selected_session_idx = st.selectbox("Select session", options=[x for x in range(len(sessions_in_range))], index=0)
-    session_view(sessions_in_range[selected_session_idx])
