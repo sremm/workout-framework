@@ -7,6 +7,9 @@ class MongoSettings(BaseSettings):
     mongo_database: str = "test_db"
     main_collection: str = "workout_sessions"
 
+    class Config:
+        env_file = ".env"
+
 
 class ApiSettings(BaseSettings):
     api_host: str = "localhost"
