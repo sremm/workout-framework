@@ -1,7 +1,7 @@
 import enum
 from collections import defaultdict
 from datetime import date, datetime
-from typing import DefaultDict, Dict, List, Optional
+from typing import DefaultDict, Dict, List, Optional, Tuple
 
 import config
 import plotly.graph_objects as go
@@ -116,18 +116,32 @@ if sessions_in_range != []:
 st.markdown("---")
 
 
-def strenght_training_sessions_view(sessions: List[model.WorkoutSession]):
-    """ filters out non strenght training sessions and shows interesting information about the sessions """
-    strength_sessions = [x for x in sessions if x.type.name == "Strength training"]
+def strenght_training_sessions_view(sessions: List[model.WorkoutSession], desired_excercises: List[str]):
+    """ filters out non strenght training sessions and shows interesting information about the desired excercises sessions """
     st.write("Strenght training sessions")
-    cols = st.beta_columns(8)
-    # create Week number col
-    total_weeks = 5
-    for week in range(total_weeks):
-        cols[0].write(f"W{week}")
+    strength_sessions = [x for x in sessions if x.type.name == "Strength training"]
 
+    sets_per_session: List[Tuple[datetime, str, List[model.WorkoutSet]]] = []
     for sess in strength_sessions:
-        st.write("Date: ", sess.start_time, "Y,W,D", sess.start_time.isocalendar())
+        if sess.sets != []:
+            per_exercise: DefaultDict[str, List] = defaultdict(list)
+            for cur_set in sess.sets:
+                if cur_set.exercise in desired_excercises:
+                    per_exercise[cur_set.exercise].append(cur_set)
+            if per_exercise != {}:
+                for excercise_name, sets in per_exercise.items():
+                    sets_per_session.append((sess.start_time, excercise_name, sets))
+    cols = st.beta_columns(len(sets_per_session))
+    for idx, (start_time, name, sets) in enumerate(sets_per_session):
+        col = cols[idx]
+        col.write(f"Date: {start_time}")
+        iso_cal = start_time.isocalendar()
+        col.write(f"W-{iso_cal.week} D-{iso_cal.weekday}")
+        col.write(name)
+        for cur_set in sets:
+            col.write(f"{cur_set.reps} x {cur_set.weights} {cur_set.unit}")
 
 
-strenght_training_sessions_view(sessions_in_range)
+excersises = st.text_input("Desired excercise [multiple with commas]", value="Squats")
+desired_excercises = excersises.split(",")
+strenght_training_sessions_view(sessions_in_range, desired_excercises)
