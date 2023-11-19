@@ -2,6 +2,7 @@ from datetime import datetime
 from wof.domain.model import TimeSeries, WorkoutSet
 from wof.import_workflows import intensity_app
 from wof.import_workflows import polar
+from wof.import_workflows import rep_count
 
 from pathlib import Path
 import pytest
@@ -85,3 +86,21 @@ class TestImportFromPolar:
             ],
             unit="bpm",
         )
+
+
+@pytest.fixture
+def sessions_from_rep_count():
+    path = Path("tests", "test_data", "rep_count_export.csv")
+    return rep_count.import_from_file(path)
+
+
+class TestImportFromRepCount:
+    def test_number_of_sessions(self, sessions_from_rep_count):
+        number_of_sessions = len(sessions_from_rep_count)
+        assert number_of_sessions == 2
+
+    def test_first_session(self, sessions_from_rep_count):
+        assert 0
+
+    def test_second_session(self, sessions_from_intensity):
+        assert 0
